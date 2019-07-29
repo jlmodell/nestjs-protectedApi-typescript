@@ -9,7 +9,7 @@ import { AppService } from './app.service';
   imports: [
     ProductsModule,
     MongooseModule.forRoot(
-      'mongodb+srv://bussejlmodell:5T1aBQa7!!!@busse-dev-l5jop.mongodb.net/busse?retryWrites=true&w=majority',
+      'mongodb+srv://bussejlmodell:5T1aBQa7!!!@busse-dev-l5jop.mongodb.net/nestjs?retryWrites=true&w=majority',
     ),
   ],
   controllers: [AppController],
