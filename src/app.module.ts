@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
@@ -6,12 +7,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 @Module({
-  imports: [
-    ProductsModule,
-    MongooseModule.forRoot(
-      'mongodb+srv://bussejlmodell:5T1aBQa7!!!@busse-dev-l5jop.mongodb.net/nestjs?retryWrites=true&w=majority',
-    ),
-  ],
+  imports: [ProductsModule, MongooseModule.forRoot(process.env.MONGODB_URI)],
   controllers: [AppController],
   providers: [AppService],
 })
