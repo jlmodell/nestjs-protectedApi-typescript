@@ -63,4 +63,22 @@ export class SalesController {
       authHeader,
     );
   }
+
+  @Get('distinct/cust')
+  async getDistinctCustomers(
+    @Body('start') start: string,
+    @Body('end') end: string,
+    @Headers('authorization') authHeader: any,
+  ) {
+    return await this.salesService.getDistinctCustomers(start, end, authHeader);
+  }
+
+  @Get('distinct/item')
+  async getDistinctItems(
+    @Body('start') start: string,
+    @Body('end') end: string,
+    @Headers('authorization') authHeader: any,
+  ) {
+    return await this.salesService.getDistinctItems(start, end, authHeader);
+  }
 }

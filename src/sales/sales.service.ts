@@ -372,4 +372,122 @@ export class SalesService {
       auth: isAuth,
     };
   }
+
+  async getDistinctCustomers(start: string, end: string, authHeader: any) {
+    try {
+      const verify = await this.verifyUser(authHeader);
+      if (!verify.auth) {
+        throw UnauthorizedException;
+      }
+    } catch (err) {
+      throw UnauthorizedException;
+    }
+
+    const summary = await this.saleModel
+      .aggregate([
+        {
+          $project: {
+            cust: {
+              $concat: ['$CNAME', '|', '$CUST'],
+            },
+            DATE: 1,
+            CUST: 1,
+            CNAME: 1,
+          },
+        },
+        {
+          $match: {
+            DATE: { $gte: new Date(start), $lte: new Date(end) },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            customer: {
+              $addToSet: {
+                name: '$cust',
+              },
+            },
+          },
+        },
+        {
+          $unwind: '$customer',
+        },
+        {
+          $sort: {
+            customer: 1,
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            customer: {
+              $push: '$customer',
+            },
+          },
+        },
+      ])
+      .exec();
+
+    return summary;
+  }
+
+  async getDistinctItems(start: string, end: string, authHeader: any) {
+    try {
+      const verify = await this.verifyUser(authHeader);
+      if (!verify.auth) {
+        throw UnauthorizedException;
+      }
+    } catch (err) {
+      throw UnauthorizedException;
+    }
+
+    const summary = await this.saleModel
+      .aggregate([
+        {
+          $project: {
+            itemList: {
+              $concat: ['$ITEM', '|', '$INAME'],
+            },
+            DATE: 1,
+            ITEM: 1,
+            INAME: 1,
+          },
+        },
+        {
+          $match: {
+            DATE: { $gte: new Date(start), $lte: new Date(end) },
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            item: {
+              $addToSet: {
+                name: '$itemList',
+              },
+            },
+          },
+        },
+        {
+          $unwind: '$item',
+        },
+        {
+          $sort: {
+            item: 1,
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            item: {
+              $push: '$item',
+            },
+          },
+        },
+      ])
+      .exec();
+
+    return summary;
+  }
 }
