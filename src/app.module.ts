@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 
 import { SalesModule } from './sales/sales.module';
 import { UsersModule } from './users/users.module';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 

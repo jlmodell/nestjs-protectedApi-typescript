@@ -1,8 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import 'dotenv/config';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { Sale } from './sale.model';
+
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class SalesService {
@@ -10,7 +13,16 @@ export class SalesService {
 
   constructor(@InjectModel('Sale') private readonly saleModel: Model<Sale>) {}
 
-  async getSales(start: string, end: string) {
+  async getSales(start: string, end: string, authHeader: any) {
+    try {
+      const verify = await this.verifyUser(authHeader);
+      if (!verify.auth) {
+        throw UnauthorizedException;
+      }
+    } catch (err) {
+      throw UnauthorizedException;
+    }
+
     const sales = await this.saleModel
       .aggregate([
         {
@@ -35,7 +47,21 @@ export class SalesService {
     }));
   }
 
-  async getSalesByCust(start: string, end: string, cid: string) {
+  async getSalesByCust(
+    start: string,
+    end: string,
+    cid: string,
+    authHeader: any,
+  ) {
+    try {
+      const verify = await this.verifyUser(authHeader);
+      if (!verify.auth) {
+        throw UnauthorizedException;
+      }
+    } catch (err) {
+      throw UnauthorizedException;
+    }
+
     const salesByCust = await this.saleModel
       .aggregate([
         {
@@ -95,7 +121,21 @@ export class SalesService {
     }));
   }
 
-  async getSalesByItem(start: string, end: string, iid: string) {
+  async getSalesByItem(
+    start: string,
+    end: string,
+    iid: string,
+    authHeader: any,
+  ) {
+    try {
+      const verify = await this.verifyUser(authHeader);
+      if (!verify.auth) {
+        throw UnauthorizedException;
+      }
+    } catch (err) {
+      throw UnauthorizedException;
+    }
+
     const salesByItem = await this.saleModel
       .aggregate([
         {
@@ -155,7 +195,21 @@ export class SalesService {
     }));
   }
 
-  async getSummaryByCust(start: string, end: string, cid: string) {
+  async getSummaryByCust(
+    start: string,
+    end: string,
+    cid: string,
+    authHeader: any,
+  ) {
+    try {
+      const verify = await this.verifyUser(authHeader);
+      if (!verify.auth) {
+        throw UnauthorizedException;
+      }
+    } catch (err) {
+      throw UnauthorizedException;
+    }
+
     const summaryByCust = await this.saleModel
       .aggregate([
         {
@@ -213,7 +267,21 @@ export class SalesService {
     }));
   }
 
-  async getSummaryByItem(start: string, end: string, iid: string) {
+  async getSummaryByItem(
+    start: string,
+    end: string,
+    iid: string,
+    authHeader: any,
+  ) {
+    try {
+      const verify = await this.verifyUser(authHeader);
+      if (!verify.auth) {
+        throw UnauthorizedException;
+      }
+    } catch (err) {
+      throw UnauthorizedException;
+    }
+
     const summaryByItem = await this.saleModel
       .aggregate([
         {
@@ -269,5 +337,39 @@ export class SalesService {
       grossProfit: sale.grossProfit,
       grossProfitMargin: sale.grossProfitMargin,
     }));
+  }
+
+  async verifyUser(authHeader: string) {
+    let isAuth;
+
+    if (!authHeader) {
+      isAuth = false;
+    }
+
+    // Authorization Bearer <Token>
+    const token = authHeader.split(' ')[1];
+    if (!token || token === '') {
+      isAuth = false;
+    }
+
+    let decodedToken;
+
+    try {
+      decodedToken = jwt.verify(token, process.env.TOKEN);
+    } catch (err) {
+      isAuth = false;
+    }
+
+    if (!decodedToken) {
+      isAuth = false;
+    }
+
+    isAuth = true;
+
+    return {
+      userId: decodedToken.userId,
+      email: decodedToken.email,
+      auth: isAuth,
+    };
   }
 }

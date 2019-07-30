@@ -1,4 +1,4 @@
-import { Controller, Body, Get, Param } from '@nestjs/common';
+import { Controller, Body, Get, Param, Headers } from '@nestjs/common';
 import { SalesService } from './sales.service';
 
 @Controller('sales')
@@ -6,8 +6,12 @@ export class SalesController {
   constructor(private readonly salesService: SalesService) {}
 
   @Get()
-  async getSales(@Body('start') start: string, @Body('end') end: string) {
-    return await this.salesService.getSales(start, end);
+  async getSales(
+    @Body('start') start: string,
+    @Body('end') end: string,
+    @Headers('authorization') authHeader: any,
+  ) {
+    return await this.salesService.getSales(start, end, authHeader);
   }
 
   @Get('cust/:cid')
@@ -15,8 +19,9 @@ export class SalesController {
     @Param('cid') cid: string,
     @Body('start') start: string,
     @Body('end') end: string,
+    @Headers('authorization') authHeader: any,
   ) {
-    return await this.salesService.getSalesByCust(start, end, cid);
+    return await this.salesService.getSalesByCust(start, end, cid, authHeader);
   }
 
   @Get('item/:iid')
@@ -24,8 +29,9 @@ export class SalesController {
     @Param('iid') iid: string,
     @Body('start') start: string,
     @Body('end') end: string,
+    @Headers('authorization') authHeader: any,
   ) {
-    return await this.salesService.getSalesByItem(start, end, iid);
+    return await this.salesService.getSalesByItem(start, end, iid, authHeader);
   }
 
   @Get('summary/cust/:cid')
@@ -33,8 +39,14 @@ export class SalesController {
     @Param('cid') cid: string,
     @Body('start') start: string,
     @Body('end') end: string,
+    @Headers('authorization') authHeader: any,
   ) {
-    return await this.salesService.getSummaryByCust(start, end, cid);
+    return await this.salesService.getSummaryByCust(
+      start,
+      end,
+      cid,
+      authHeader,
+    );
   }
 
   @Get('summary/item/:iid')
@@ -42,7 +54,13 @@ export class SalesController {
     @Param('iid') iid: string,
     @Body('start') start: string,
     @Body('end') end: string,
+    @Headers('authorization') authHeader: any,
   ) {
-    return await this.salesService.getSummaryByItem(start, end, iid);
+    return await this.salesService.getSummaryByItem(
+      start,
+      end,
+      iid,
+      authHeader,
+    );
   }
 }
