@@ -1,5 +1,9 @@
 import 'dotenv/config';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -14,7 +18,16 @@ export class UsersService {
 
   constructor(@InjectModel('User') private readonly userModel: Model<User>) {}
 
-  async getUsers() {
+  async getUsers(authHeader: any) {
+    try {
+      const verify = await this.verifyUser(authHeader);
+      if (!verify.auth) {
+        throw UnauthorizedException;
+      }
+    } catch (err) {
+      throw UnauthorizedException;
+    }
+
     return await this.userModel.find().exec();
   }
 
@@ -41,7 +54,16 @@ export class UsersService {
     }
   }
 
-  async deleteUser(email: string) {
+  async deleteUser(email: string, authHeader: any) {
+    try {
+      const verify = await this.verifyUser(authHeader);
+      if (!verify.auth) {
+        throw UnauthorizedException;
+      }
+    } catch (err) {
+      throw UnauthorizedException;
+    }
+
     try {
       const user = await this.userModel.findOne({ email }).exec();
 
@@ -96,5 +118,39 @@ export class UsersService {
     } catch (err) {
       throw err;
     }
+  }
+
+  async verifyUser(authHeader: string) {
+    let isAuth;
+
+    if (!authHeader) {
+      isAuth = false;
+    }
+
+    // Authorization Bearer <Token>
+    const token = authHeader.split(' ')[1];
+    if (!token || token === '') {
+      isAuth = false;
+    }
+
+    let decodedToken;
+
+    try {
+      decodedToken = jwt.verify(token, process.env.TOKEN);
+    } catch (err) {
+      isAuth = false;
+    }
+
+    if (!decodedToken) {
+      isAuth = false;
+    }
+
+    isAuth = true;
+
+    return {
+      userId: decodedToken.userId,
+      email: decodedToken.email,
+      auth: isAuth,
+    };
   }
 }
