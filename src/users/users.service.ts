@@ -104,7 +104,7 @@ export class UsersService {
           userId: user.id,
           email: user.email,
           msg: `token expires in 6 hrs`,
-          msg2: `<3`,
+          hiddenmsg: `<3 meagan`,
         },
         process.env.TOKEN,
         { expiresIn: '6h' },
