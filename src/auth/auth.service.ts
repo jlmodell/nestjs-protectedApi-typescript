@@ -20,22 +20,18 @@ export class AuthService {
       return accessDenied;
     }
 
-    let decodedToken;
-
     try {
-      decodedToken = jwt.verify(token, process.env.TOKEN);
+      const decodedToken = jwt.verify(token, process.env.TOKEN);
+      if (!decodedToken) {
+        return accessDenied;
+      }
+      return {
+        userId: decodedToken.userId,
+        email: decodedToken.email,
+        auth: true,
+      };
     } catch (err) {
       return accessDenied;
     }
-
-    if (!decodedToken) {
-      return accessDenied;
-    }
-
-    return {
-      userId: decodedToken.userId,
-      email: decodedToken.email,
-      auth: true,
-    };
   }
 }
