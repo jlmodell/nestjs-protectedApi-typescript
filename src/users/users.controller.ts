@@ -39,7 +39,7 @@ export class UsersController {
     return await this.usersService.deleteUser(email);
   }
 
-  @Get('login')
+  @Post('login')
   async login(
     @Body('email') email: string,
     @Body('password') password: string,
