@@ -14,17 +14,18 @@ export class AuthService {
       return accessDenied;
     }
 
-    // Authorization Bearer <Token>
-    const [_, token] = authHeader.split(' ');
-    if (!token || token === '') {
-      return accessDenied;
-    }
-
     try {
+      // Authorization Bearer <Token>
+      const [_, token] = authHeader.split(' ');
+      if (!token || token === '') {
+        return accessDenied;
+      }
+
       const decodedToken = jwt.verify(token, process.env.TOKEN);
       if (!decodedToken) {
         return accessDenied;
       }
+
       return {
         userId: decodedToken.userId,
         email: decodedToken.email,
