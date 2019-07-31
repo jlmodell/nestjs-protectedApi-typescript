@@ -1,18 +1,27 @@
 import { Controller, Body, Get, Param, Headers } from '@nestjs/common';
+
 import { SalesService } from './sales.service';
+import { AuthService } from '../auth/auth.service';
 
 @Controller('sales')
 export class SalesController {
-  constructor(private readonly salesService: SalesService) {}
+  constructor(
+    private readonly salesService: SalesService,
+    private readonly authService: AuthService,
+  ) {}
 
   // GET list of sales for date range
   @Get()
   async getSales(
     @Body('start') start: string,
     @Body('end') end: string,
-    @Headers('authorization') authHeader: any,
+    @Headers('authorization') authHeader: string,
   ) {
-    return await this.salesService.getSales(start, end, authHeader);
+    const verify = await this.authService.verifyUser(authHeader);
+    if (!verify.auth) {
+      return { ...verify };
+    }
+    return await this.salesService.getSales(start, end);
   }
 
   // GET list of sales for specific customer id (cid) or group by date range
@@ -22,9 +31,13 @@ export class SalesController {
     @Param('cid') cid: string,
     @Body('start') start: string,
     @Body('end') end: string,
-    @Headers('authorization') authHeader: any,
+    @Headers('authorization') authHeader: string,
   ) {
-    return await this.salesService.getSalesByCust(start, end, cid, authHeader);
+    const verify = await this.authService.verifyUser(authHeader);
+    if (!verify.auth) {
+      return { ...verify };
+    }
+    return await this.salesService.getSalesByCust(start, end, cid);
   }
 
   //GET list of sales for specific item id (iid) or group by date range
@@ -34,9 +47,13 @@ export class SalesController {
     @Param('iid') iid: string,
     @Body('start') start: string,
     @Body('end') end: string,
-    @Headers('authorization') authHeader: any,
+    @Headers('authorization') authHeader: string,
   ) {
-    return await this.salesService.getSalesByItem(start, end, iid, authHeader);
+    const verify = await this.authService.verifyUser(authHeader);
+    if (!verify.auth) {
+      return { ...verify };
+    }
+    return await this.salesService.getSalesByItem(start, end, iid);
   }
 
   //GET summarized detail for customer by cid
@@ -45,14 +62,13 @@ export class SalesController {
     @Param('cid') cid: string,
     @Body('start') start: string,
     @Body('end') end: string,
-    @Headers('authorization') authHeader: any,
+    @Headers('authorization') authHeader: string,
   ) {
-    return await this.salesService.getSummaryByCust(
-      start,
-      end,
-      cid,
-      authHeader,
-    );
+    const verify = await this.authService.verifyUser(authHeader);
+    if (!verify.auth) {
+      return { ...verify };
+    }
+    return await this.salesService.getSummaryByCust(start, end, cid);
   }
 
   //GET summarized detail for item by iid
@@ -61,14 +77,13 @@ export class SalesController {
     @Param('iid') iid: string,
     @Body('start') start: string,
     @Body('end') end: string,
-    @Headers('authorization') authHeader: any,
+    @Headers('authorization') authHeader: string,
   ) {
-    return await this.salesService.getSummaryByItem(
-      start,
-      end,
-      iid,
-      authHeader,
-    );
+    const verify = await this.authService.verifyUser(authHeader);
+    if (!verify.auth) {
+      return { ...verify };
+    }
+    return await this.salesService.getSummaryByItem(start, end, iid);
   }
 
   //GET list of distinct customers in a date range
@@ -76,9 +91,13 @@ export class SalesController {
   async getDistinctCustomers(
     @Body('start') start: string,
     @Body('end') end: string,
-    @Headers('authorization') authHeader: any,
+    @Headers('authorization') authHeader: string,
   ) {
-    return await this.salesService.getDistinctCustomers(start, end, authHeader);
+    const verify = await this.authService.verifyUser(authHeader);
+    if (!verify.auth) {
+      return { ...verify };
+    }
+    return await this.salesService.getDistinctCustomers(start, end);
   }
 
   //GET list of distinct items in a date range
@@ -86,8 +105,12 @@ export class SalesController {
   async getDistinctItems(
     @Body('start') start: string,
     @Body('end') end: string,
-    @Headers('authorization') authHeader: any,
+    @Headers('authorization') authHeader: string,
   ) {
-    return await this.salesService.getDistinctItems(start, end, authHeader);
+    const verify = await this.authService.verifyUser(authHeader);
+    if (!verify.auth) {
+      return { ...verify };
+    }
+    return await this.salesService.getDistinctItems(start, end);
   }
 }

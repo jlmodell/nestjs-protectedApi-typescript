@@ -13,16 +13,7 @@ export class SalesService {
 
   constructor(@InjectModel('Sale') private readonly saleModel: Model<Sale>) {}
 
-  async getSales(start: string, end: string, authHeader: any) {
-    try {
-      const verify = await this.verifyUser(authHeader);
-      if (!verify.auth) {
-        throw UnauthorizedException;
-      }
-    } catch (err) {
-      throw UnauthorizedException;
-    }
-
+  async getSales(start: string, end: string) {
     const sales = await this.saleModel
       .aggregate([
         {
@@ -47,21 +38,7 @@ export class SalesService {
     }));
   }
 
-  async getSalesByCust(
-    start: string,
-    end: string,
-    cid: string,
-    authHeader: any,
-  ) {
-    try {
-      const verify = await this.verifyUser(authHeader);
-      if (!verify.auth) {
-        throw UnauthorizedException;
-      }
-    } catch (err) {
-      throw UnauthorizedException;
-    }
-
+  async getSalesByCust(start: string, end: string, cid: string) {
     const salesByCust = await this.saleModel
       .aggregate([
         {
@@ -121,21 +98,7 @@ export class SalesService {
     }));
   }
 
-  async getSalesByItem(
-    start: string,
-    end: string,
-    iid: string,
-    authHeader: any,
-  ) {
-    try {
-      const verify = await this.verifyUser(authHeader);
-      if (!verify.auth) {
-        throw UnauthorizedException;
-      }
-    } catch (err) {
-      throw UnauthorizedException;
-    }
-
+  async getSalesByItem(start: string, end: string, iid: string) {
     const salesByItem = await this.saleModel
       .aggregate([
         {
@@ -195,21 +158,7 @@ export class SalesService {
     }));
   }
 
-  async getSummaryByCust(
-    start: string,
-    end: string,
-    cid: string,
-    authHeader: any,
-  ) {
-    try {
-      const verify = await this.verifyUser(authHeader);
-      if (!verify.auth) {
-        throw UnauthorizedException;
-      }
-    } catch (err) {
-      throw UnauthorizedException;
-    }
-
+  async getSummaryByCust(start: string, end: string, cid: string) {
     const summaryByCust = await this.saleModel
       .aggregate([
         {
@@ -267,21 +216,7 @@ export class SalesService {
     }));
   }
 
-  async getSummaryByItem(
-    start: string,
-    end: string,
-    iid: string,
-    authHeader: any,
-  ) {
-    try {
-      const verify = await this.verifyUser(authHeader);
-      if (!verify.auth) {
-        throw UnauthorizedException;
-      }
-    } catch (err) {
-      throw UnauthorizedException;
-    }
-
+  async getSummaryByItem(start: string, end: string, iid: string) {
     const summaryByItem = await this.saleModel
       .aggregate([
         {
@@ -339,50 +274,7 @@ export class SalesService {
     }));
   }
 
-  async verifyUser(authHeader: string) {
-    let isAuth;
-
-    if (!authHeader) {
-      isAuth = false;
-    }
-
-    // Authorization Bearer <Token>
-    const token = authHeader.split(' ')[1];
-    if (!token || token === '') {
-      isAuth = false;
-    }
-
-    let decodedToken;
-
-    try {
-      decodedToken = jwt.verify(token, process.env.TOKEN);
-    } catch (err) {
-      isAuth = false;
-    }
-
-    if (!decodedToken) {
-      isAuth = false;
-    }
-
-    isAuth = true;
-
-    return {
-      userId: decodedToken.userId,
-      email: decodedToken.email,
-      auth: isAuth,
-    };
-  }
-
-  async getDistinctCustomers(start: string, end: string, authHeader: any) {
-    try {
-      const verify = await this.verifyUser(authHeader);
-      if (!verify.auth) {
-        throw UnauthorizedException;
-      }
-    } catch (err) {
-      throw UnauthorizedException;
-    }
-
+  async getDistinctCustomers(start: string, end: string) {
     const summary = await this.saleModel
       .aggregate([
         {
@@ -432,16 +324,7 @@ export class SalesService {
     return summary;
   }
 
-  async getDistinctItems(start: string, end: string, authHeader: any) {
-    try {
-      const verify = await this.verifyUser(authHeader);
-      if (!verify.auth) {
-        throw UnauthorizedException;
-      }
-    } catch (err) {
-      throw UnauthorizedException;
-    }
-
+  async getDistinctItems(start: string, end: string) {
     const summary = await this.saleModel
       .aggregate([
         {
