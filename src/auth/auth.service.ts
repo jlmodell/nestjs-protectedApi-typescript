@@ -5,40 +5,37 @@ import { Injectable } from '@nestjs/common';
 @Injectable()
 export class AuthService {
   async verifyUser(authHeader: string) {
-    let isAuth, decodedToken;
-
-    const accessDenied = 'Please login to access this function.';
+    const accessDenied = {
+      msg: 'Please login to access this function.',
+      auth: false,
+    };
 
     if (!authHeader) {
-      isAuth = false;
-      return { accessDenied };
+      return accessDenied;
     }
 
     // Authorization Bearer <Token>
     const [_, token] = authHeader.split(' ');
     if (!token || token === '') {
-      isAuth = false;
-      return { accessDenied };
+      return accessDenied;
     }
+
+    let decodedToken;
 
     try {
       decodedToken = jwt.verify(token, process.env.TOKEN);
     } catch (err) {
-      isAuth = false;
-      return { accessDenied };
+      return accessDenied;
     }
 
     if (!decodedToken) {
-      isAuth = false;
-      return { accessDenied };
+      return accessDenied;
     }
-
-    isAuth = true;
 
     return {
       userId: decodedToken.userId,
       email: decodedToken.email,
-      auth: isAuth,
+      auth: true,
     };
   }
 }
