@@ -1,39 +1,36 @@
 import * as jwt from 'jsonwebtoken';
 
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AuthService {
   async verifyUser(authHeader: string) {
     let isAuth, decodedToken;
 
-    const authMsg = {
-      auth: isAuth,
-      msg: 'Please login to access this function.',
-    };
+    const accessDenied = 'Please login to access this function.';
 
     if (!authHeader) {
       isAuth = false;
-      return authMsg;
+      return { accessDenied };
     }
 
     // Authorization Bearer <Token>
-    const token = authHeader.split(' ')[1];
+    const [_, token] = authHeader.split(' ');
     if (!token || token === '') {
       isAuth = false;
-      return authMsg;
+      return { accessDenied };
     }
 
     try {
       decodedToken = jwt.verify(token, process.env.TOKEN);
     } catch (err) {
       isAuth = false;
-      return authMsg;
+      return { accessDenied };
     }
 
     if (!decodedToken) {
       isAuth = false;
-      return authMsg;
+      return { accessDenied };
     }
 
     isAuth = true;
