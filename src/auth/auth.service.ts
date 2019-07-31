@@ -5,10 +5,10 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 @Injectable()
 export class AuthService {
   async verifyUser(authHeader: string) {
-    let isAuth, authMsg, decodedToken;
+    let isAuth, decodedToken;
 
-    authMsg = {
-      auth: null,
+    const authMsg = {
+      auth: isAuth,
       msg: 'Please login to access this function.',
     };
 
@@ -39,9 +39,9 @@ export class AuthService {
     isAuth = true;
 
     return {
-      userId: decodedToken.userId || null,
-      email: decodedToken.email || null,
-      auth: isAuth || null,
+      userId: decodedToken.userId,
+      email: decodedToken.email,
+      auth: isAuth,
     };
   }
 }
