@@ -11,10 +11,10 @@ export class SalesController {
   ) {}
 
   // GET list of sales for date range
-  @Get()
+  @Get(':start/:end')
   async getSales(
-    @Body('start') start: string,
-    @Body('end') end: string,
+    @Param('start') start: string,
+    @Param('end') end: string,
     @Headers('authorization') authHeader: string,
   ) {
     const verify = await this.authService.verifyUser(authHeader);
@@ -26,11 +26,11 @@ export class SalesController {
 
   // GET list of sales for specific customer id (cid) or group by date range
   // split group by "-" eg) 1300-9988
-  @Get('cust/:cid')
+  @Get('cust/:cid/:start/:end')
   async getSalesByCust(
     @Param('cid') cid: string,
-    @Body('start') start: string,
-    @Body('end') end: string,
+    @Param('start') start: string,
+    @Param('end') end: string,
     @Headers('authorization') authHeader: string,
   ) {
     const verify = await this.authService.verifyUser(authHeader);
@@ -42,11 +42,11 @@ export class SalesController {
 
   //GET list of sales for specific item id (iid) or group by date range
   // split group by "-" eg) 298-723
-  @Get('item/:iid')
+  @Get('item/:iid/:start/:end')
   async getSalesByItem(
     @Param('iid') iid: string,
-    @Body('start') start: string,
-    @Body('end') end: string,
+    @Param('start') start: string,
+    @Param('end') end: string,
     @Headers('authorization') authHeader: string,
   ) {
     const verify = await this.authService.verifyUser(authHeader);
@@ -57,11 +57,11 @@ export class SalesController {
   }
 
   //GET summarized detail for customer by cid
-  @Get('summary/cust/:cid')
+  @Get('summary/cust/:cid/:start/:end')
   async getSummaryByCust(
     @Param('cid') cid: string,
-    @Body('start') start: string,
-    @Body('end') end: string,
+    @Param('start') start: string,
+    @Param('end') end: string,
     @Headers('authorization') authHeader: string,
   ) {
     const verify = await this.authService.verifyUser(authHeader);
@@ -72,11 +72,11 @@ export class SalesController {
   }
 
   //GET summarized detail for item by iid
-  @Get('summary/item/:iid')
+  @Get('summary/item/:iid/:start/:end')
   async getSummaryByItem(
     @Param('iid') iid: string,
-    @Body('start') start: string,
-    @Body('end') end: string,
+    @Param('start') start: string,
+    @Param('end') end: string,
     @Headers('authorization') authHeader: string,
   ) {
     const verify = await this.authService.verifyUser(authHeader);
@@ -101,10 +101,10 @@ export class SalesController {
   }
 
   //GET list of distinct items in a date range
-  @Get('distinct/item')
+  @Get('distinct/item/:start/:end')
   async getDistinctItems(
-    @Body('start') start: string,
-    @Body('end') end: string,
+    @Param('start') start: string,
+    @Param('end') end: string,
     @Headers('authorization') authHeader: string,
   ) {
     const verify = await this.authService.verifyUser(authHeader);
