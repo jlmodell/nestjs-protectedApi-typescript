@@ -87,10 +87,10 @@ export class SalesController {
   }
 
   //GET list of distinct customers in a date range
-  @Get('distinct/cust')
+  @Get('distinct/cust/:start/:end')
   async getDistinctCustomers(
-    @Body('start') start: string,
-    @Body('end') end: string,
+    @Param('start') start: string,
+    @Param('end') end: string,
     @Headers('authorization') authHeader: string,
   ) {
     const verify = await this.authService.verifyUser(authHeader);
