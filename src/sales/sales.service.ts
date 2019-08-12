@@ -38,6 +38,120 @@ export class SalesService {
     }));
   }
 
+  async getSalesDistinctCust(start: string, end: string) {
+    const sales = await this.saleModel
+      .aggregate([
+        {
+          $match: {
+            DATE: { $gte: new Date(start), $lte: new Date(end) },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              customer: '$CNAME',
+              cid: '$CUST',
+            },
+            quantity: { $sum: '$QTY' },
+            sales: { $sum: '$SALE' },
+            costs: { $sum: '$COST' },
+          },
+        },
+        {
+          $addFields: {
+            grossProfit: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: { $subtract: ['$sales', '$costs'] },
+                else: 0,
+              },
+            },
+            grossProfitMargin: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: {
+                  $multiply: [
+                    {
+                      $divide: [{ $subtract: ['$sales', '$costs'] }, '$sales'],
+                    },
+                    100,
+                  ],
+                },
+                else: 0,
+              },
+            },
+          },
+        },
+      ])
+      .exec();
+
+    return sales.map(sale => ({
+      _id: sale._id,
+      quantity: sale.quantity,
+      sales: sale.sales,
+      costs: sale.costs,
+      grossProfit: sale.grossProfit,
+      grossProfitMargin: sale.grossProfitMargin,
+    }));
+  }
+
+  async getSalesDistinctItem(start: string, end: string) {
+    const sales = await this.saleModel
+      .aggregate([
+        {
+          $match: {
+            DATE: { $gte: new Date(start), $lte: new Date(end) },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              item: '$INAME',
+              iid: '$ITEM',
+            },
+            quantity: { $sum: '$QTY' },
+            sales: { $sum: '$SALE' },
+            costs: { $sum: '$COST' },
+          },
+        },
+        {
+          $addFields: {
+            grossProfit: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: { $subtract: ['$sales', '$costs'] },
+                else: 0,
+              },
+            },
+            grossProfitMargin: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: {
+                  $multiply: [
+                    {
+                      $divide: [{ $subtract: ['$sales', '$costs'] }, '$sales'],
+                    },
+                    100,
+                  ],
+                },
+                else: 0,
+              },
+            },
+          },
+        },
+      ])
+      .exec();
+
+    return sales.map(sale => ({
+      _id: sale._id,
+      quantity: sale.quantity,
+      sales: sale.sales,
+      costs: sale.costs,
+      grossProfit: sale.grossProfit,
+      grossProfitMargin: sale.grossProfitMargin,
+    }));
+  }
+
   async getSalesByCust(start: string, end: string, cid: string) {
     const salesByCust = await this.saleModel
       .aggregate([

@@ -11,7 +11,33 @@ export class SalesController {
   ) {}
 
   // GET list of sales for date range
-  @Get(':start/:end')
+  @Get('/distinct/cust/:start/:end')
+  async getSalesDistinctCust(
+    @Param('start') start: string,
+    @Param('end') end: string,
+    @Headers('authorization') authHeader: string,
+  ) {
+    const verify = await this.authService.verifyUser(authHeader);
+    if (!verify.auth) {
+      return { ...verify };
+    }
+    return await this.salesService.getSalesDistinctCust(start, end);
+  }
+
+  @Get('/distinct/item/:start/:end')
+  async getSalesDistinctItem(
+    @Param('start') start: string,
+    @Param('end') end: string,
+    @Headers('authorization') authHeader: string,
+  ) {
+    const verify = await this.authService.verifyUser(authHeader);
+    if (!verify.auth) {
+      return { ...verify };
+    }
+    return await this.salesService.getSalesDistinctItem(start, end);
+  }
+
+  @Get('/distinct/cust/:start/:end')
   async getSales(
     @Param('start') start: string,
     @Param('end') end: string,
@@ -87,7 +113,7 @@ export class SalesController {
   }
 
   //GET list of distinct customers in a date range
-  @Get('distinct/cust/:start/:end')
+  @Get('distinct/cust-list/:start/:end')
   async getDistinctCustomers(
     @Param('start') start: string,
     @Param('end') end: string,
@@ -101,7 +127,7 @@ export class SalesController {
   }
 
   //GET list of distinct items in a date range
-  @Get('distinct/item/:start/:end')
+  @Get('distinct/item-list/:start/:end')
   async getDistinctItems(
     @Param('start') start: string,
     @Param('end') end: string,
