@@ -1,4 +1,4 @@
-import { Controller, Body, Get, Param, Headers } from '@nestjs/common';
+import { Controller, Get, Param, Headers } from '@nestjs/common';
 
 import { SalesService } from './sales.service';
 import { AuthService } from '../auth/auth.service';
