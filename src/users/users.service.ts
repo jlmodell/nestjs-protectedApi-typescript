@@ -77,13 +77,16 @@ export class UsersService {
         );
       }
 
+      let createdAt = new Date();
+      let expiresAt = new Date(createdAt.setHours(createdAt.getHours() + 6));
+
       const token = jwt.sign(
         {
           userId: user.id,
           email: user.email,
           msg: `token expires in 6 hrs`,
-          createdAt: new Date(),
-          expiresAt: new Date().setHours(6),
+          createdAt,
+          expiresAt,
         },
         process.env.TOKEN,
         { expiresIn: '6h' },
@@ -93,8 +96,8 @@ export class UsersService {
         userId: user.id,
         token,
         tokenExpiration: 6,
-        createdAt: new Date(),
-        expiresAt: new Date().setHours(6),
+        createdAt,
+        expiresAt,
       };
     } catch (err) {
       throw err;
