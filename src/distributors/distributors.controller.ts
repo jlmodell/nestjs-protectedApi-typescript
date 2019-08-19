@@ -22,4 +22,13 @@ export class DistributorController {
     }
     return await this.distributorsService.getDistributor(dist);
   }
+
+  @Get('distinct')
+  async getDistinctDist(@Headers('authorization') authHeader: string) {
+    const verify = await this.authService.verifyUser(authHeader);
+    if (!verify.auth) {
+      return { ...verify };
+    }
+    return await this.distributorsService.getDistinctDist();
+  }
 }

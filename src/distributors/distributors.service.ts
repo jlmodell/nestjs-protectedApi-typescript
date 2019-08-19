@@ -39,4 +39,21 @@ export class DistributorService {
       cash_discount: dist.cash_discount,
     }));
   }
+
+  async getDistinctDist() {
+    const distributors = await this.distributorModel
+      .aggregate([
+        {
+          distributor: 1,
+        },
+        {
+          $sort: {
+            $distributor: 1,
+          },
+        },
+      ])
+      .exec();
+
+    return distributors;
+  }
 }
