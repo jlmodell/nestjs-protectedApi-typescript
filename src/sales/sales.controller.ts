@@ -139,4 +139,19 @@ export class SalesController {
     }
     return await this.salesService.getDistinctItems(start, end);
   }
+
+  @Get('avg-price/:cid/:iid/:start/:end')
+  async getAvgPrice(
+    @Param('cid') cid: string,
+    @Param('iid') iid: string,
+    @Param('start') start: string,
+    @Param('end') end: string,
+    @Headers('authorization') authHeader: string,
+  ) {
+    const verify = await this.authService.verifyUser(authHeader);
+    if (!verify.auth) {
+      return { ...verify };
+    }
+    return await this.salesService.getAvgPrice(cid, iid, start, end);
+  }
 }

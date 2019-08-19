@@ -487,4 +487,48 @@ export class SalesService {
 
     return summary;
   }
+
+  async getAvgPrice(cid: string, iid: string, start: string, end: string) {
+    const avgPrice = await this.saleModel
+      .aggregate([
+        {
+          $match: {
+            DATE: { $gte: new Date(start), $lte: new Date(end) },
+            CUST: cid,
+            ITEM: iid,
+          },
+        },
+        {
+          $group: {
+            _id: {
+              customer: '$CNAME',
+              cid: '$CUST',
+              item: '$INAME',
+              iid: '$ITEM',
+            },
+            quantity: { $sum: '$QTY' },
+            sales: { $sum: '$SALE' },
+          },
+        },
+        {
+          $addFields: {
+            avgSalePrice: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: { $divide: ['$sales', '$quantity'] },
+                else: 0,
+              },
+            },
+          },
+        },
+      ])
+      .exec();
+
+    return avgPrice.map(sale => ({
+      _id: sale._id,
+      quantity: sale.quantity,
+      sales: sale.sales,
+      avgSalePrice: sale.avgSalePrice,
+    }));
+  }
 }
