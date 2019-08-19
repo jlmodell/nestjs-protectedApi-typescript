@@ -11,6 +11,15 @@ export class DistributorController {
   ) {}
 
   // GET distributor info
+  @Get('/')
+  async getDistinctDist(@Headers('authorization') authHeader: string) {
+    const verify = await this.authService.verifyUser(authHeader);
+    if (!verify.auth) {
+      return { ...verify };
+    }
+    return await this.distributorsService.getDistinctDist();
+  }
+
   @Get(':dist')
   async getSales(
     @Param('dist') dist: string,
@@ -21,14 +30,5 @@ export class DistributorController {
       return { ...verify };
     }
     return await this.distributorsService.getDistributor(dist);
-  }
-
-  @Get('distinct')
-  async getDistinctDist(@Headers('authorization') authHeader: string) {
-    const verify = await this.authService.verifyUser(authHeader);
-    if (!verify.auth) {
-      return { ...verify };
-    }
-    return await this.distributorsService.getDistinctDist();
   }
 }

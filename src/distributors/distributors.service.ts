@@ -41,19 +41,45 @@ export class DistributorService {
   }
 
   async getDistinctDist() {
-    const distributors = await this.distributorModel
+    const distributorList = await this.distributorModel
       .aggregate([
         {
-          distributor: 1,
+          $project: {
+            dist: {
+              $concat: ['$distributor', '|'],
+            },
+            distributor: 1,
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            distributor: {
+              $addToSet: {
+                id: '$dist',
+              },
+            },
+          },
+        },
+        {
+          $unwind: '$distributor',
         },
         {
           $sort: {
-            $distributor: 1,
+            distributor: 1,
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            distributor: {
+              $push: '$distributor',
+            },
           },
         },
       ])
       .exec();
 
-    return distributors;
+    return distributorList;
   }
 }
