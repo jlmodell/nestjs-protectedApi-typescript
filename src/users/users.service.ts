@@ -78,7 +78,8 @@ export class UsersService {
       }
 
       let createdAt = new Date();
-      let expiresAt = new Date(createdAt.setHours(createdAt.getHours() + 6));
+      let expiresAt = new Date();
+      expiresAt = new Date(expiresAt.setHours(expiresAt.getHours() + 6));
 
       const token = jwt.sign(
         {
