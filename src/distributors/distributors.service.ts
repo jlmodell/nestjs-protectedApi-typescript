@@ -46,7 +46,7 @@ export class DistributorService {
         {
           $project: {
             dist: {
-              $concat: ['$distributor', '|'],
+              $concat: ['$distributor'],
             },
             distributor: 1,
           },
