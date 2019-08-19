@@ -93,6 +93,8 @@ export class UsersService {
         userId: user.id,
         token,
         tokenExpiration: 6,
+        createdAt: new Date(),
+        expiresAt: new Date().setHours(6),
       };
     } catch (err) {
       throw err;
