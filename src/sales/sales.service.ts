@@ -232,6 +232,7 @@ export class SalesService {
             quantity: { $sum: '$QTY' },
             sales: { $sum: '$SALE' },
             costs: { $sum: '$COST' },
+            rebates: {$sum: '$REBATECREDIT'},
           },
         },
         {
@@ -267,6 +268,7 @@ export class SalesService {
       quantity: sale.quantity,
       sales: sale.sales,
       costs: sale.costs,
+      rebates: sale.rebates,
       grossProfit: sale.grossProfit,
       grossProfitMargin: sale.grossProfitMargin,
     }));
@@ -290,6 +292,7 @@ export class SalesService {
             quantity: { $sum: '$QTY' },
             sales: { $sum: '$SALE' },
             costs: { $sum: '$COST' },
+            rebates: { $sum: '$REBATECREDIT'},
           },
         },
         {
@@ -325,6 +328,7 @@ export class SalesService {
       quantity: sale.quantity,
       sales: sale.sales,
       costs: sale.costs,
+      rebates: sale.rebates,
       grossProfit: sale.grossProfit,
       grossProfitMargin: sale.grossProfitMargin,
     }));
