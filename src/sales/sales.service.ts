@@ -171,6 +171,7 @@ export class SalesService {
             },
             quantity: { $sum: '$QTY' },
             sales: { $sum: '$SALE' },
+            rebates: { $sum: '$REBATECREDIT' },
             costs: { $sum: '$COST' },
           },
         },
@@ -179,7 +180,9 @@ export class SalesService {
             grossProfit: {
               $cond: {
                 if: { $gt: ['$sales', 0] },
-                then: { $subtract: ['$sales', '$costs'] },
+                then: {
+                  $add: ['$rebates', { $subtract: ['$sales', '$costs'] }],
+                },
                 else: 0,
               },
             },
@@ -189,7 +192,15 @@ export class SalesService {
                 then: {
                   $multiply: [
                     {
-                      $divide: [{ $subtract: ['$sales', '$costs'] }, '$sales'],
+                      $divide: [
+                        {
+                          $add: [
+                            '$rebates',
+                            { $subtract: ['$sales', '$costs'] },
+                          ],
+                        },
+                        '$sales',
+                      ],
                     },
                     100,
                   ],
@@ -206,6 +217,7 @@ export class SalesService {
       _id: sale._id,
       quantity: sale.quantity,
       sales: sale.sales,
+      rebates: sale.rebates,
       costs: sale.costs,
       grossProfit: sale.grossProfit,
       grossProfitMargin: sale.grossProfitMargin,
@@ -231,8 +243,8 @@ export class SalesService {
             },
             quantity: { $sum: '$QTY' },
             sales: { $sum: '$SALE' },
+            rebates: { $sum: '$REBATECREDIT' },
             costs: { $sum: '$COST' },
-            rebates: {$sum: '$REBATECREDIT'},
           },
         },
         {
@@ -240,7 +252,9 @@ export class SalesService {
             grossProfit: {
               $cond: {
                 if: { $gt: ['$sales', 0] },
-                then: { $subtract: ['$sales', '$costs'] },
+                then: {
+                  $add: ['$rebates', { $subtract: ['$sales', '$costs'] }],
+                },
                 else: 0,
               },
             },
@@ -250,7 +264,15 @@ export class SalesService {
                 then: {
                   $multiply: [
                     {
-                      $divide: [{ $subtract: ['$sales', '$costs'] }, '$sales'],
+                      $divide: [
+                        {
+                          $add: [
+                            '$rebates',
+                            { $subtract: ['$sales', '$costs'] },
+                          ],
+                        },
+                        '$sales',
+                      ],
                     },
                     100,
                   ],
@@ -267,8 +289,8 @@ export class SalesService {
       _id: sale._id,
       quantity: sale.quantity,
       sales: sale.sales,
-      costs: sale.costs,
       rebates: sale.rebates,
+      costs: sale.costs,
       grossProfit: sale.grossProfit,
       grossProfitMargin: sale.grossProfitMargin,
     }));
@@ -292,7 +314,7 @@ export class SalesService {
             quantity: { $sum: '$QTY' },
             sales: { $sum: '$SALE' },
             costs: { $sum: '$COST' },
-            rebates: { $sum: '$REBATECREDIT'},
+            rebates: { $sum: '$REBATECREDIT' },
           },
         },
         {
