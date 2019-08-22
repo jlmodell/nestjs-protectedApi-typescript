@@ -108,9 +108,9 @@ export class SalesService {
     return sales.map(sale => ({
       _id: sale._id,
       quantity: sale.quantity,
-      sales: sale.sales,
-      rebates: sale.rebates,
-      costs: sale.costs,
+      sales: parseFloat(sale.sales.toFixed(2)),
+      rebates: parseFloat(sale.rebates.toFixed(2)),
+      costs: parseFloat(sale.costs.toFixed(2)),
       grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
     }));
@@ -185,9 +185,9 @@ export class SalesService {
     return sales.map(sale => ({
       _id: sale._id,
       quantity: sale.quantity,
-      sales: sale.sales,
-      rebates: sale.rebates,
-      costs: sale.costs,
+      sales: parseFloat(sale.sales.toFixed(2)),
+      rebates: parseFloat(sale.rebates.toFixed(2)),
+      costs: parseFloat(sale.costs.toFixed(2)),
       grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
     }));
@@ -265,9 +265,9 @@ export class SalesService {
     return salesByCust.map(sale => ({
       _id: sale._id,
       quantity: sale.quantity,
-      sales: sale.sales,
-      rebates: sale.rebates,
-      costs: sale.costs,
+      sales: parseFloat(sale.sales.toFixed(2)),
+      rebates: parseFloat(sale.rebates.toFixed(2)),
+      costs: parseFloat(sale.costs.toFixed(2)),
       grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
     }));
@@ -345,9 +345,9 @@ export class SalesService {
     return salesByItem.map(sale => ({
       _id: sale._id,
       quantity: sale.quantity,
-      sales: sale.sales,
-      rebates: sale.rebates,
-      costs: sale.costs,
+      sales: parseFloat(sale.sales.toFixed(2)),
+      rebates: parseFloat(sale.rebates.toFixed(2)),
+      costs: parseFloat(sale.costs.toFixed(2)),
       grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
     }));
@@ -423,9 +423,9 @@ export class SalesService {
     return summaryByCust.map(sale => ({
       _id: sale._id,
       quantity: sale.quantity,
-      sales: sale.sales,
-      costs: sale.costs,
-      rebates: sale.rebates,
+      sales: parseFloat(sale.sales.toFixed(2)),
+      costs: parseFloat(sale.costs.toFixed(2)),
+      rebates: parseFloat(sale.rebates.toFixed(2)),
       grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
     }));
@@ -501,10 +501,10 @@ export class SalesService {
     return summaryByItem.map(sale => ({
       _id: sale._id,
       quantity: sale.quantity,
-      sales: sale.sales,
-      costs: sale.costs,
-      grossProfit: sale.grossProfit,
-      grossProfitMargin: sale.grossProfitMargin,
+      sales: parseFloat(sale.sales.toFixed(2)),
+      costs: parseFloat(sale.costs.toFixed(2)),
+      grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
+      grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
     }));
   }
 
@@ -647,7 +647,7 @@ export class SalesService {
     return avgPrice.map(sale => ({
       _id: sale._id,
       quantity: sale.quantity,
-      sales: sale.sales,
+      sales: parseFloat(sale.sales.toFixed(2)),
       avgSalePrice: parseFloat(sale.avgSalePrice.toFixed(2)),
     }));
   }
