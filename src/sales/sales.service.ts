@@ -1,4 +1,5 @@
 import 'dotenv/config';
+var round = require('mongo-round');
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -110,8 +111,8 @@ export class SalesService {
       sales: sale.sales,
       rebates: sale.rebates,
       costs: sale.costs,
-      grossProfit: sale.grossProfit,
-      grossProfitMargin: sale.grossProfitMargin,
+      grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
+      grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
     }));
   }
 
@@ -187,8 +188,8 @@ export class SalesService {
       sales: sale.sales,
       rebates: sale.rebates,
       costs: sale.costs,
-      grossProfit: sale.grossProfit,
-      grossProfitMargin: sale.grossProfitMargin,
+      grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
+      grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
     }));
   }
 
@@ -267,8 +268,8 @@ export class SalesService {
       sales: sale.sales,
       rebates: sale.rebates,
       costs: sale.costs,
-      grossProfit: sale.grossProfit,
-      grossProfitMargin: sale.grossProfitMargin,
+      grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
+      grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
     }));
   }
 
@@ -347,8 +348,8 @@ export class SalesService {
       sales: sale.sales,
       rebates: sale.rebates,
       costs: sale.costs,
-      grossProfit: sale.grossProfit,
-      grossProfitMargin: sale.grossProfitMargin,
+      grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
+      grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
     }));
   }
 
@@ -425,8 +426,8 @@ export class SalesService {
       sales: sale.sales,
       costs: sale.costs,
       rebates: sale.rebates,
-      grossProfit: sale.grossProfit,
-      grossProfitMargin: sale.grossProfitMargin,
+      grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
+      grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
     }));
   }
 
@@ -647,7 +648,7 @@ export class SalesService {
       _id: sale._id,
       quantity: sale.quantity,
       sales: sale.sales,
-      avgSalePrice: sale.avgSalePrice,
+      avgSalePrice: parseFloat(sale.avgSalePrice.toFixed(2)),
     }));
   }
 }

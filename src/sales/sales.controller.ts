@@ -37,18 +37,18 @@ export class SalesController {
     return await this.salesService.getSalesDistinctItem(start, end);
   }
 
-  @Get('/distinct/cust/:start/:end')
-  async getSales(
-    @Param('start') start: string,
-    @Param('end') end: string,
-    @Headers('authorization') authHeader: string,
-  ) {
-    const verify = await this.authService.verifyUser(authHeader);
-    if (!verify.auth) {
-      return { ...verify };
-    }
-    return await this.salesService.getSales(start, end);
-  }
+  // @Get('/distinct/cust/:start/:end')
+  // async getSales(
+  //   @Param('start') start: string,
+  //   @Param('end') end: string,
+  //   @Headers('authorization') authHeader: string,
+  // ) {
+  //   const verify = await this.authService.verifyUser(authHeader);
+  //   if (!verify.auth) {
+  //     return { ...verify };
+  //   }
+  //   return await this.salesService.getSales(start, end);
+  // }
 
   // GET list of sales for specific customer id (cid) or group by date range
   // split group by "-" eg) 1300-9988
