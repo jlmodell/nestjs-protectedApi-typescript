@@ -93,6 +93,14 @@ export class SalesService {
             },
           },
         },
+        {
+          $unwind: '$sales',
+        },
+        {
+          $sort: {
+            sales: -1,
+          },
+        },
       ])
       .exec();
 
@@ -160,6 +168,14 @@ export class SalesService {
                 else: 0,
               },
             },
+          },
+        },
+        {
+          $unwind: '$sales',
+        },
+        {
+          $sort: {
+            sales: -1,
           },
         },
       ])
@@ -234,6 +250,14 @@ export class SalesService {
             },
           },
         },
+        {
+          $unwind: '$sales',
+        },
+        {
+          $sort: {
+            sales: -1,
+          },
+        },
       ])
       .exec();
 
@@ -306,6 +330,14 @@ export class SalesService {
             },
           },
         },
+        {
+          $unwind: '$sales',
+        },
+        {
+          $sort: {
+            sales: -1,
+          },
+        },
       ])
       .exec();
 
@@ -346,7 +378,9 @@ export class SalesService {
             grossProfit: {
               $cond: {
                 if: { $gt: ['$sales', 0] },
-                then: { $subtract: ['$sales', '$costs'] },
+                then: {
+                  $add: ['$rebates', { $subtract: ['$sales', '$costs'] }],
+                },
                 else: 0,
               },
             },
@@ -356,7 +390,15 @@ export class SalesService {
                 then: {
                   $multiply: [
                     {
-                      $divide: [{ $subtract: ['$sales', '$costs'] }, '$sales'],
+                      $divide: [
+                        {
+                          $add: [
+                            '$rebates',
+                            { $subtract: ['$sales', '$costs'] },
+                          ],
+                        },
+                        '$sales',
+                      ],
                     },
                     100,
                   ],
@@ -364,6 +406,14 @@ export class SalesService {
                 else: 0,
               },
             },
+          },
+        },
+        {
+          $unwind: '$sales',
+        },
+        {
+          $sort: {
+            sales: -1,
           },
         },
       ])
@@ -397,6 +447,7 @@ export class SalesService {
             },
             quantity: { $sum: '$QTY' },
             sales: { $sum: '$SALE' },
+            rebates: { $sum: '$REBATECREDIT' },
             costs: { $sum: '$COST' },
           },
         },
@@ -405,7 +456,9 @@ export class SalesService {
             grossProfit: {
               $cond: {
                 if: { $gt: ['$sales', 0] },
-                then: { $subtract: ['$sales', '$costs'] },
+                then: {
+                  $add: ['$rebates', { $subtract: ['$sales', '$costs'] }],
+                },
                 else: 0,
               },
             },
@@ -415,7 +468,15 @@ export class SalesService {
                 then: {
                   $multiply: [
                     {
-                      $divide: [{ $subtract: ['$sales', '$costs'] }, '$sales'],
+                      $divide: [
+                        {
+                          $add: [
+                            '$rebates',
+                            { $subtract: ['$sales', '$costs'] },
+                          ],
+                        },
+                        '$sales',
+                      ],
                     },
                     100,
                   ],
@@ -423,6 +484,14 @@ export class SalesService {
                 else: 0,
               },
             },
+          },
+        },
+        {
+          $unwind: '$sales',
+        },
+        {
+          $sort: {
+            sales: -1,
           },
         },
       ])
