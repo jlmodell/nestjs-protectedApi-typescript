@@ -213,49 +213,6 @@ export class SalesService {
                 else: 0,
               },
             },
-            currentTradeDiscounts: {
-              $switch: {
-                branches: [
-                  {
-                    case: { $eq: ['$_id.cid', '1300'] },
-                    then: { $multiply: ['$sales', 0.075] },
-                  },
-                  {
-                    case: { $eq: ['$_id.cid', '2091'] },
-                    then: { $multiply: ['$sales', 0.03] },
-                  },
-                  {
-                    case: { $eq: ['$_id.cid', '1716'] },
-                    then: { $multiply: ['$sales', 0.05] },
-                  },
-                  {
-                    case: { $eq: ['$_id.cid', '2084'] },
-                    then: { $multiply: ['$sales', 0.0324] },
-                  },
-                  {
-                    case: { $eq: ['$_id.cid', '9988'] },
-                    then: { $multiply: ['$sales', 0.08] },
-                  },
-                  {
-                    case: { $eq: ['$_id.cid', '2614'] },
-                    then: { $multiply: ['$sales', 0.01] },
-                  },
-                  {
-                    case: { $eq: ['$_id.cid', '1070'] },
-                    then: { $multiply: ['$sales', 0.01] },
-                  },
-                  {
-                    case: { $eq: ['$_id.cid', '1402'] },
-                    then: { $multiply: ['$sales', 0.07] },
-                  },
-                  {
-                    case: { $eq: ['$_id.cid', '1404'] },
-                    then: { $multiply: ['$sales', 0.07] },
-                  },
-                ],
-                default: 0,
-              },
-            },
           },
         },
         {
@@ -277,7 +234,6 @@ export class SalesService {
       costs: parseFloat(sale.costs.toFixed(2)),
       grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
-      currentTradeDiscounts: parseFloat(sale.currentTradeDiscounts.toFixed(2)),
     }));
   }
 
@@ -705,49 +661,6 @@ export class SalesService {
                 else: 0,
               },
             },
-            currentTradeDiscounts: {
-              $switch: {
-                branches: [
-                  {
-                    case: { $eq: ['$_id.cid', '1300'] },
-                    then: { $multiply: ['$sales', 0.075] },
-                  },
-                  {
-                    case: { $eq: ['$_id.cid', '2091'] },
-                    then: { $multiply: ['$sales', 0.03] },
-                  },
-                  {
-                    case: { $eq: ['$_id.cid', '1716'] },
-                    then: { $multiply: ['$sales', 0.05] },
-                  },
-                  {
-                    case: { $eq: ['$_id.cid', '2084'] },
-                    then: { $multiply: ['$sales', 0.0324] },
-                  },
-                  {
-                    case: { $eq: ['$_id.cid', '9988'] },
-                    then: { $multiply: ['$sales', 0.08] },
-                  },
-                  {
-                    case: { $eq: ['$_id.cid', '2614'] },
-                    then: { $multiply: ['$sales', 0.01] },
-                  },
-                  {
-                    case: { $eq: ['$_id.cid', '1070'] },
-                    then: { $multiply: ['$sales', 0.01] },
-                  },
-                  {
-                    case: { $eq: ['$_id.cid', '1402'] },
-                    then: { $multiply: ['$sales', 0.07] },
-                  },
-                  {
-                    case: { $eq: ['$_id.cid', '1404'] },
-                    then: { $multiply: ['$sales', 0.07] },
-                  },
-                ],
-                default: 0,
-              },
-            },
           },
         },
         {
@@ -768,7 +681,6 @@ export class SalesService {
       costs: parseFloat(sale.costs.toFixed(2)),
       grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
-      currentTradeDiscounts: parseFloat(sale.currentTradeDiscounts.toFixed(2)),
     }));
   }
 
