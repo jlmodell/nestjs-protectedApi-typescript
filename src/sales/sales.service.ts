@@ -61,37 +61,6 @@ export class SalesService {
         },
         {
           $addFields: {
-            grossProfit: {
-              $cond: {
-                if: { $gt: ['$sales', 0] },
-                then: {
-                  $add: ['$rebates', { $subtract: ['$sales', '$costs'] }],
-                },
-                else: 0,
-              },
-            },
-            grossProfitMargin: {
-              $cond: {
-                if: { $gt: ['$sales', 0] },
-                then: {
-                  $multiply: [
-                    {
-                      $divide: [
-                        {
-                          $add: [
-                            '$rebates',
-                            { $subtract: ['$sales', '$costs'] },
-                          ],
-                        },
-                        '$sales',
-                      ],
-                    },
-                    100,
-                  ],
-                },
-                else: 0,
-              },
-            },
             currentTradeDiscounts: {
               $switch: {
                 branches: [
@@ -138,6 +107,54 @@ export class SalesService {
           },
         },
         {
+          $addFields: {
+            grossProfit: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: {
+                  $add: [
+                    '$rebates',
+                    {
+                      $subtract: [
+                        '$sales',
+                        { $add: ['$currentTradeDiscounts', '$costs'] },
+                      ],
+                    },
+                  ],
+                },
+                else: 0,
+              },
+            },
+            grossProfitMargin: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: {
+                  $multiply: [
+                    {
+                      $divide: [
+                        {
+                          $add: [
+                            '$rebates',
+                            {
+                              $subtract: [
+                                '$sales',
+                                { $add: ['$currentTradeDiscounts', '$costs'] },
+                              ],
+                            },
+                          ],
+                        },
+                        '$sales',
+                      ],
+                    },
+                    100,
+                  ],
+                },
+                else: 0,
+              },
+            },
+          },
+        },
+        {
           $unwind: '$sales',
         },
         {
@@ -153,10 +170,11 @@ export class SalesService {
       quantity: sale.quantity,
       sales: parseFloat(sale.sales.toFixed(2)),
       rebates: parseFloat(sale.rebates.toFixed(2)),
-      costs: parseFloat(sale.costs.toFixed(2)),
+      costs: parseFloat(sale.costs.toFixed(2)) * -1,
       grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
-      currentTradeDiscounts: parseFloat(sale.currentTradeDiscounts.toFixed(2)),
+      currentTradeDiscounts:
+        parseFloat(sale.currentTradeDiscounts.toFixed(2)) * -1,
     }));
   }
 
@@ -182,11 +200,24 @@ export class SalesService {
         },
         {
           $addFields: {
+            currentTradeDiscounts: 0,
+          },
+        },
+        {
+          $addFields: {
             grossProfit: {
               $cond: {
                 if: { $gt: ['$sales', 0] },
                 then: {
-                  $add: ['$rebates', { $subtract: ['$sales', '$costs'] }],
+                  $add: [
+                    '$rebates',
+                    {
+                      $subtract: [
+                        '$sales',
+                        { $add: ['$currentTradeDiscounts', '$costs'] },
+                      ],
+                    },
+                  ],
                 },
                 else: 0,
               },
@@ -201,7 +232,12 @@ export class SalesService {
                         {
                           $add: [
                             '$rebates',
-                            { $subtract: ['$sales', '$costs'] },
+                            {
+                              $subtract: [
+                                '$sales',
+                                { $add: ['$currentTradeDiscounts', '$costs'] },
+                              ],
+                            },
                           ],
                         },
                         '$sales',
@@ -262,37 +298,6 @@ export class SalesService {
         },
         {
           $addFields: {
-            grossProfit: {
-              $cond: {
-                if: { $gt: ['$sales', 0] },
-                then: {
-                  $add: ['$rebates', { $subtract: ['$sales', '$costs'] }],
-                },
-                else: 0,
-              },
-            },
-            grossProfitMargin: {
-              $cond: {
-                if: { $gt: ['$sales', 0] },
-                then: {
-                  $multiply: [
-                    {
-                      $divide: [
-                        {
-                          $add: [
-                            '$rebates',
-                            { $subtract: ['$sales', '$costs'] },
-                          ],
-                        },
-                        '$sales',
-                      ],
-                    },
-                    100,
-                  ],
-                },
-                else: 0,
-              },
-            },
             currentTradeDiscounts: {
               $switch: {
                 branches: [
@@ -334,6 +339,54 @@ export class SalesService {
                   },
                 ],
                 default: 0,
+              },
+            },
+          },
+        },
+        {
+          $addFields: {
+            grossProfit: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: {
+                  $add: [
+                    '$rebates',
+                    {
+                      $subtract: [
+                        '$sales',
+                        { $add: ['$currentTradeDiscounts', '$costs'] },
+                      ],
+                    },
+                  ],
+                },
+                else: 0,
+              },
+            },
+            grossProfitMargin: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: {
+                  $multiply: [
+                    {
+                      $divide: [
+                        {
+                          $add: [
+                            '$rebates',
+                            {
+                              $subtract: [
+                                '$sales',
+                                { $add: ['$currentTradeDiscounts', '$costs'] },
+                              ],
+                            },
+                          ],
+                        },
+                        '$sales',
+                      ],
+                    },
+                    100,
+                  ],
+                },
+                else: 0,
               },
             },
           },
@@ -386,37 +439,6 @@ export class SalesService {
         },
         {
           $addFields: {
-            grossProfit: {
-              $cond: {
-                if: { $gt: ['$sales', 0] },
-                then: {
-                  $add: ['$rebates', { $subtract: ['$sales', '$costs'] }],
-                },
-                else: 0,
-              },
-            },
-            grossProfitMargin: {
-              $cond: {
-                if: { $gt: ['$sales', 0] },
-                then: {
-                  $multiply: [
-                    {
-                      $divide: [
-                        {
-                          $add: [
-                            '$rebates',
-                            { $subtract: ['$sales', '$costs'] },
-                          ],
-                        },
-                        '$sales',
-                      ],
-                    },
-                    100,
-                  ],
-                },
-                else: 0,
-              },
-            },
             currentTradeDiscounts: {
               $switch: {
                 branches: [
@@ -458,6 +480,54 @@ export class SalesService {
                   },
                 ],
                 default: 0,
+              },
+            },
+          },
+        },
+        {
+          $addFields: {
+            grossProfit: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: {
+                  $add: [
+                    '$rebates',
+                    {
+                      $subtract: [
+                        '$sales',
+                        { $add: ['$currentTradeDiscounts', '$costs'] },
+                      ],
+                    },
+                  ],
+                },
+                else: 0,
+              },
+            },
+            grossProfitMargin: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: {
+                  $multiply: [
+                    {
+                      $divide: [
+                        {
+                          $add: [
+                            '$rebates',
+                            {
+                              $subtract: [
+                                '$sales',
+                                { $add: ['$currentTradeDiscounts', '$costs'] },
+                              ],
+                            },
+                          ],
+                        },
+                        '$sales',
+                      ],
+                    },
+                    100,
+                  ],
+                },
+                else: 0,
               },
             },
           },
@@ -508,37 +578,6 @@ export class SalesService {
         },
         {
           $addFields: {
-            grossProfit: {
-              $cond: {
-                if: { $gt: ['$sales', 0] },
-                then: {
-                  $add: ['$rebates', { $subtract: ['$sales', '$costs'] }],
-                },
-                else: 0,
-              },
-            },
-            grossProfitMargin: {
-              $cond: {
-                if: { $gt: ['$sales', 0] },
-                then: {
-                  $multiply: [
-                    {
-                      $divide: [
-                        {
-                          $add: [
-                            '$rebates',
-                            { $subtract: ['$sales', '$costs'] },
-                          ],
-                        },
-                        '$sales',
-                      ],
-                    },
-                    100,
-                  ],
-                },
-                else: 0,
-              },
-            },
             currentTradeDiscounts: {
               $switch: {
                 branches: [
@@ -580,6 +619,54 @@ export class SalesService {
                   },
                 ],
                 default: 0,
+              },
+            },
+          },
+        },
+        {
+          $addFields: {
+            grossProfit: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: {
+                  $add: [
+                    '$rebates',
+                    {
+                      $subtract: [
+                        '$sales',
+                        { $add: ['$currentTradeDiscounts', '$costs'] },
+                      ],
+                    },
+                  ],
+                },
+                else: 0,
+              },
+            },
+            grossProfitMargin: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: {
+                  $multiply: [
+                    {
+                      $divide: [
+                        {
+                          $add: [
+                            '$rebates',
+                            {
+                              $subtract: [
+                                '$sales',
+                                { $add: ['$currentTradeDiscounts', '$costs'] },
+                              ],
+                            },
+                          ],
+                        },
+                        '$sales',
+                      ],
+                    },
+                    100,
+                  ],
+                },
+                else: 0,
               },
             },
           },
@@ -630,11 +717,24 @@ export class SalesService {
         },
         {
           $addFields: {
+            currentTradeDiscounts: 0,
+          },
+        },
+        {
+          $addFields: {
             grossProfit: {
               $cond: {
                 if: { $gt: ['$sales', 0] },
                 then: {
-                  $add: ['$rebates', { $subtract: ['$sales', '$costs'] }],
+                  $add: [
+                    '$rebates',
+                    {
+                      $subtract: [
+                        '$sales',
+                        { $add: ['$currentTradeDiscounts', '$costs'] },
+                      ],
+                    },
+                  ],
                 },
                 else: 0,
               },
@@ -649,7 +749,12 @@ export class SalesService {
                         {
                           $add: [
                             '$rebates',
-                            { $subtract: ['$sales', '$costs'] },
+                            {
+                              $subtract: [
+                                '$sales',
+                                { $add: ['$currentTradeDiscounts', '$costs'] },
+                              ],
+                            },
                           ],
                         },
                         '$sales',
