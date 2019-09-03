@@ -267,9 +267,9 @@ export class SalesService {
       quantity: sale.quantity,
       sales: parseFloat(sale.sales.toFixed(2)),
       rebates: parseFloat(sale.rebates.toFixed(2)),
-      costs: parseFloat(sale.costs.toFixed(2)),
+      costs: parseFloat(sale.costs.toFixed(2)) * -1,
       grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
-      grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
+      grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)) * -1,
     }));
   }
 
@@ -407,10 +407,11 @@ export class SalesService {
       quantity: sale.quantity,
       sales: parseFloat(sale.sales.toFixed(2)),
       rebates: parseFloat(sale.rebates.toFixed(2)),
-      costs: parseFloat(sale.costs.toFixed(2)),
+      costs: parseFloat(sale.costs.toFixed(2)) * -1,
       grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
-      currentTradeDiscounts: parseFloat(sale.currentTradeDiscounts.toFixed(2)),
+      currentTradeDiscounts:
+        parseFloat(sale.currentTradeDiscounts.toFixed(2)) * -1,
     }));
   }
 
@@ -548,10 +549,11 @@ export class SalesService {
       quantity: sale.quantity,
       sales: parseFloat(sale.sales.toFixed(2)),
       rebates: parseFloat(sale.rebates.toFixed(2)),
-      costs: parseFloat(sale.costs.toFixed(2)),
+      costs: parseFloat(sale.costs.toFixed(2)) * -1,
       grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
-      currentTradeDiscounts: parseFloat(sale.currentTradeDiscounts.toFixed(2)),
+      currentTradeDiscounts:
+        parseFloat(sale.currentTradeDiscounts.toFixed(2)) * -1,
     }));
   }
 
@@ -686,11 +688,12 @@ export class SalesService {
       _id: sale._id,
       quantity: sale.quantity,
       sales: parseFloat(sale.sales.toFixed(2)),
-      costs: parseFloat(sale.costs.toFixed(2)),
+      costs: parseFloat(sale.costs.toFixed(2)) * -1,
       rebates: parseFloat(sale.rebates.toFixed(2)),
       grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
-      currentTradeDiscounts: parseFloat(sale.currentTradeDiscounts.toFixed(2)),
+      currentTradeDiscounts:
+        parseFloat(sale.currentTradeDiscounts.toFixed(2)) * -1,
     }));
   }
 
@@ -783,7 +786,7 @@ export class SalesService {
       _id: sale._id,
       quantity: sale.quantity,
       sales: parseFloat(sale.sales.toFixed(2)),
-      costs: parseFloat(sale.costs.toFixed(2)),
+      costs: parseFloat(sale.costs.toFixed(2)) * -1,
       grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
     }));
