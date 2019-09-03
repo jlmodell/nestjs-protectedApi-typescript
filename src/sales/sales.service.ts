@@ -167,14 +167,15 @@ export class SalesService {
 
     return sales.map(sale => ({
       _id: sale._id,
-      quantity: sale.quantity,
-      sales: parseFloat(sale.sales.toFixed(2)),
-      rebates: parseFloat(sale.rebates.toFixed(2)),
-      costs: parseFloat(sale.costs.toFixed(2)) * -1,
-      grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
+      quantity: sale.quantity.toLocaleString(),
+      sales: parseFloat(sale.sales.toFixed(2)).toLocaleString(),
+      rebates: parseFloat(sale.rebates.toFixed(2)).toLocaleString(),
+      costs: (parseFloat(sale.costs.toFixed(2)) * -1).toLocaleString(),
+      grossProfit: parseFloat(sale.grossProfit.toFixed(2)).toLocaleString(),
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
-      currentTradeDiscounts:
-        parseFloat(sale.currentTradeDiscounts.toFixed(2)) * -1,
+      currentTradeDiscounts: (
+        parseFloat(sale.currentTradeDiscounts.toFixed(2)) * -1
+      ).toLocaleString(),
     }));
   }
 
@@ -264,11 +265,11 @@ export class SalesService {
 
     return sales.map(sale => ({
       _id: sale._id,
-      quantity: sale.quantity,
-      sales: parseFloat(sale.sales.toFixed(2)),
-      rebates: parseFloat(sale.rebates.toFixed(2)),
-      costs: parseFloat(sale.costs.toFixed(2)) * -1,
-      grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
+      quantity: sale.quantity.toLocaleString(),
+      sales: parseFloat(sale.sales.toFixed(2)).toLocaleString(),
+      rebates: parseFloat(sale.rebates.toFixed(2)).toLocaleString(),
+      costs: (parseFloat(sale.costs.toFixed(2)) * -1).toLocaleString(),
+      grossProfit: parseFloat(sale.grossProfit.toFixed(2)).toLocaleString(),
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
     }));
   }
@@ -404,14 +405,15 @@ export class SalesService {
 
     return salesByCust.map(sale => ({
       _id: sale._id,
-      quantity: sale.quantity,
-      sales: parseFloat(sale.sales.toFixed(2)),
-      rebates: parseFloat(sale.rebates.toFixed(2)),
-      costs: parseFloat(sale.costs.toFixed(2)) * -1,
-      grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
+      quantity: sale.quantity.toLocaleString(),
+      sales: parseFloat(sale.sales.toFixed(2)).toLocaleString(),
+      rebates: parseFloat(sale.rebates.toFixed(2)).toLocaleString(),
+      costs: (parseFloat(sale.costs.toFixed(2)) * -1).toLocaleString(),
+      grossProfit: parseFloat(sale.grossProfit.toFixed(2)).toLocaleString(),
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
-      currentTradeDiscounts:
-        parseFloat(sale.currentTradeDiscounts.toFixed(2)) * -1,
+      currentTradeDiscounts: (
+        parseFloat(sale.currentTradeDiscounts.toFixed(2)) * -1
+      ).toLocaleString(),
     }));
   }
 
@@ -546,14 +548,15 @@ export class SalesService {
 
     return salesByItem.map(sale => ({
       _id: sale._id,
-      quantity: sale.quantity,
-      sales: parseFloat(sale.sales.toFixed(2)),
-      rebates: parseFloat(sale.rebates.toFixed(2)),
-      costs: parseFloat(sale.costs.toFixed(2)) * -1,
-      grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
+      quantity: sale.quantity.toLocaleString(),
+      sales: parseFloat(sale.sales.toFixed(2)).toLocaleString(),
+      rebates: parseFloat(sale.rebates.toFixed(2)).toLocaleString(),
+      costs: (parseFloat(sale.costs.toFixed(2)) * -1).toLocaleString(),
+      grossProfit: parseFloat(sale.grossProfit.toFixed(2)).toLocaleString(),
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
-      currentTradeDiscounts:
-        parseFloat(sale.currentTradeDiscounts.toFixed(2)) * -1,
+      currentTradeDiscounts: (
+        parseFloat(sale.currentTradeDiscounts.toFixed(2)) * -1
+      ).toLocaleString(),
     }));
   }
 
@@ -686,14 +689,15 @@ export class SalesService {
 
     return summaryByCust.map(sale => ({
       _id: sale._id,
-      quantity: sale.quantity,
-      sales: parseFloat(sale.sales.toFixed(2)),
-      costs: parseFloat(sale.costs.toFixed(2)) * -1,
-      rebates: parseFloat(sale.rebates.toFixed(2)),
-      grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
+      quantity: sale.quantity.toLocaleString(),
+      sales: parseFloat(sale.sales.toFixed(2)).toLocaleString(),
+      costs: (parseFloat(sale.costs.toFixed(2)) * -1).toLocaleString(),
+      rebates: parseFloat(sale.rebates.toFixed(2)).toLocaleString(),
+      grossProfit: parseFloat(sale.grossProfit.toFixed(2)).toLocaleString(),
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
-      currentTradeDiscounts:
-        parseFloat(sale.currentTradeDiscounts.toFixed(2)) * -1,
+      currentTradeDiscounts: (
+        parseFloat(sale.currentTradeDiscounts.toFixed(2)) * -1
+      ).toLocaleString(),
     }));
   }
 
@@ -784,10 +788,10 @@ export class SalesService {
 
     return summaryByItem.map(sale => ({
       _id: sale._id,
-      quantity: sale.quantity,
-      sales: parseFloat(sale.sales.toFixed(2)),
-      costs: parseFloat(sale.costs.toFixed(2)) * -1,
-      grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
+      quantity: sale.quantity.toLocaleString(),
+      sales: parseFloat(sale.sales.toFixed(2)).toLocaleString(),
+      costs: (parseFloat(sale.costs.toFixed(2)) * -1).toLocaleString(),
+      grossProfit: parseFloat(sale.grossProfit.toFixed(2)).toLocaleString(),
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
     }));
   }
