@@ -269,7 +269,7 @@ export class SalesService {
       rebates: parseFloat(sale.rebates.toFixed(2)),
       costs: parseFloat(sale.costs.toFixed(2)) * -1,
       grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
-      grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)) * -1,
+      grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
     }));
   }
 
