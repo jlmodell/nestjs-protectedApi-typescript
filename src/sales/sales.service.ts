@@ -338,6 +338,30 @@ export class SalesService {
           grossProfit: parseFloat(obj.grossProfit.toFixed(2)),
           grossprofitMargin: parseFloat(obj.grossProfitMargin.toFixed(2)),
         }))[0],
+      trailingTwelveMonths: rebates
+        .filter(obj => obj._id.cid == sale._id.cid)
+        .map(obj => ({
+          quantity:
+            (parseFloat(obj.quantity.toFixed()) / numOfDays) * numOfRebateDays,
+          sales:
+            (parseFloat(obj.sales.toFixed(2)) / numOfDays) * numOfRebateDays,
+          costs:
+            (parseFloat(obj.costs.toFixed(2)) / -numOfDays) * numOfRebateDays,
+          rebates:
+            (parseFloat(obj.rebates.toFixed(2)) / numOfDays) * numOfRebateDays,
+          currentTradeDiscounts:
+            (parseFloat(obj.currentTradeDiscounts.toFixed(2)) / -numOfDays) *
+            numOfRebateDays,
+          grossProfit:
+            (parseFloat(obj.grossProfit.toFixed(2)) / numOfDays) *
+            numOfRebateDays,
+          grossprofitMargin:
+            (((parseFloat(obj.grossProfit.toFixed(2)) / numOfDays) *
+              numOfRebateDays) /
+              ((parseFloat(obj.sales.toFixed(2)) / numOfDays) *
+                numOfRebateDays)) *
+            100,
+        }))[0],
     }));
 
     return final;
