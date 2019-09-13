@@ -368,6 +368,251 @@ export class SalesService {
   }
 
   async getSalesDistinctItem(start: string, end: string) {
+    const rebateStartDate = new Date(
+      new Date(end).setFullYear(new Date(end).getFullYear() - 1),
+    );
+    const rebateEndDate = new Date(end);
+
+    const numOfDays =
+      (new Date(end).getTime() - new Date(start).getTime()) /
+      (1000 * 60 * 60 * 24);
+    const numOfRebateDays =
+      (rebateEndDate.getTime() - rebateStartDate.getTime()) /
+      (1000 * 60 * 60 * 24);
+
+    const rebates = await this.saleModel
+      .aggregate([
+        {
+          $match: {
+            DATE: { $gte: rebateStartDate, $lte: rebateEndDate },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              customer: '$CNAME',
+              cid: '$CUST',
+              item: '$INAME',
+              iid: '$ITEM',
+            },
+            _quantity: { $sum: '$QTY' },
+            _sales: { $sum: '$SALE' },
+            _costs: { $sum: '$COST' },
+            _rebates: { $sum: '$REBATECREDIT' },
+          },
+        },
+        {
+          $project: {
+            quantity: {
+              $multiply: [
+                { $divide: ['$_quantity', numOfRebateDays] },
+                numOfDays,
+              ],
+            },
+            sales: {
+              $multiply: [{ $divide: ['$_sales', numOfRebateDays] }, numOfDays],
+            },
+            costs: {
+              $multiply: [{ $divide: ['$_costs', numOfRebateDays] }, numOfDays],
+            },
+            rebates: {
+              $multiply: [
+                { $divide: ['$_rebates', numOfRebateDays] },
+                numOfDays,
+              ],
+            },
+          },
+        },
+        {
+          $addFields: {
+            currentTradeDiscounts: {
+              $switch: {
+                branches: [
+                  {
+                    case: { $eq: ['$_id.cid', '1300'] },
+                    then: { $multiply: ['$sales', 0.075] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '2091'] },
+                    then: { $multiply: ['$sales', 0.03] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1716'] },
+                    then: { $multiply: ['$sales', 0.05] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '2084'] },
+                    then: { $multiply: ['$sales', 0.0324] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '9988'] },
+                    then: { $multiply: ['$sales', 0.08] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '2614'] },
+                    then: { $multiply: ['$sales', 0.01] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1070'] },
+                    then: { $multiply: ['$sales', 0.01] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1402'] },
+                    then: { $multiply: ['$sales', 0.07] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1404'] },
+                    then: { $multiply: ['$sales', 0.07] },
+                  },
+                ],
+                default: 0,
+              },
+            },
+          },
+        },
+        {
+          $addFields: {
+            grossProfit: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: {
+                  $add: [
+                    '$rebates',
+                    {
+                      $subtract: [
+                        '$sales',
+                        { $add: ['$currentTradeDiscounts', '$costs'] },
+                      ],
+                    },
+                  ],
+                },
+                else: 0,
+              },
+            },
+            grossProfitMargin: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: {
+                  $multiply: [
+                    {
+                      $divide: [
+                        {
+                          $add: [
+                            '$rebates',
+                            {
+                              $subtract: [
+                                '$sales',
+                                { $add: ['$currentTradeDiscounts', '$costs'] },
+                              ],
+                            },
+                          ],
+                        },
+                        '$sales',
+                      ],
+                    },
+                    100,
+                  ],
+                },
+                else: 0,
+              },
+            },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              item: '$_id.item',
+              iid: '$_id.iid',
+            },
+            quantity: { $sum: '$quantity' },
+            sales: { $sum: '$sales' },
+            rebates: { $sum: '$rebates' },
+            costs: { $sum: '$costs' },
+            currentTradeDiscounts: { $sum: '$currentTradeDiscounts' },
+            grossProfit: { $sum: '$grossProfit' },
+          },
+        },
+      ])
+      .exec();
+
+    const tradeDiscounts = await this.saleModel
+      .aggregate([
+        {
+          $match: {
+            DATE: { $gte: new Date(start), $lte: new Date(end) },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              customer: '$CNAME',
+              cid: '$CUST',
+              item: '$INAME',
+              iid: '$ITEM',
+            },
+            sales: { $sum: '$SALE' },
+          },
+        },
+        {
+          $addFields: {
+            currentTradeDiscounts: {
+              $switch: {
+                branches: [
+                  {
+                    case: { $eq: ['$_id.cid', '1300'] },
+                    then: { $multiply: ['$sales', 0.075] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '2091'] },
+                    then: { $multiply: ['$sales', 0.03] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1716'] },
+                    then: { $multiply: ['$sales', 0.05] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '2084'] },
+                    then: { $multiply: ['$sales', 0.0324] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '9988'] },
+                    then: { $multiply: ['$sales', 0.08] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '2614'] },
+                    then: { $multiply: ['$sales', 0.01] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1070'] },
+                    then: { $multiply: ['$sales', 0.01] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1402'] },
+                    then: { $multiply: ['$sales', 0.07] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1404'] },
+                    then: { $multiply: ['$sales', 0.07] },
+                  },
+                ],
+                default: 0,
+              },
+            },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              item: '$_id.item',
+              iid: '$_id.iid',
+            },
+            sales: { $sum: '$sales' },
+            currentTradeDiscounts: { $sum: '$currentTradeDiscounts' },
+          },
+        },
+      ])
+      .exec();
+
     const sales = await this.saleModel
       .aggregate([
         {
@@ -451,15 +696,73 @@ export class SalesService {
       ])
       .exec();
 
-    return sales.map(sale => ({
+    const final = sales.map(sale => ({
       _id: sale._id,
       quantity: sale.quantity,
       sales: parseFloat(sale.sales.toFixed(2)),
       rebates: parseFloat(sale.rebates.toFixed(2)),
       costs: parseFloat(sale.costs.toFixed(2)) * -1,
-      grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
-      grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
+      currentTradeDiscounts:
+        tradeDiscounts
+          .filter(obj => obj._id.iid == sale._id.iid)
+          .map(obj => obj.currentTradeDiscounts)[0]
+          .toFixed(2) * -1,
+      grossProfit:
+        parseFloat(sale.grossProfit.toFixed(2)) +
+        tradeDiscounts
+          .filter(obj => obj._id.iid == sale._id.iid)
+          .map(obj => obj.currentTradeDiscounts)[0]
+          .toFixed(2) *
+          -1,
+      grossProfitMargin:
+        ((parseFloat(sale.grossProfit.toFixed(2)) +
+          tradeDiscounts
+            .filter(obj => obj._id.iid == sale._id.iid)
+            .map(obj => obj.currentTradeDiscounts)[0]
+            .toFixed(2) *
+            -1) /
+          parseFloat(sale.sales.toFixed(2))) *
+        100,
+      normalizedTrailingTwelveMonths: rebates
+        .filter(obj => obj._id.iid == sale._id.iid)
+        .map(obj => ({
+          quantity: parseFloat(obj.quantity.toFixed()),
+          sales: parseFloat(obj.sales.toFixed(2)),
+          costs: parseFloat(obj.costs.toFixed(2)) * -1,
+          rebates: parseFloat(obj.rebates.toFixed(2)),
+          currentTradeDiscounts:
+            parseFloat(obj.currentTradeDiscounts.toFixed(2)) * -1,
+          grossProfit: parseFloat(obj.grossProfit.toFixed(2)),
+          grossprofitMargin:
+            (parseFloat(obj.grossProfit.toFixed(2)) /
+              parseFloat(obj.sales.toFixed(2))) *
+            100,
+        }))[0],
+      trailingTwelveMonths: rebates
+        .filter(obj => obj._id.iid == sale._id.iid)
+        .map(obj => ({
+          quantity:
+            (parseFloat(obj.quantity.toFixed()) / numOfDays) * numOfRebateDays,
+          sales:
+            (parseFloat(obj.sales.toFixed(2)) / numOfDays) * numOfRebateDays,
+          costs:
+            (parseFloat(obj.costs.toFixed(2)) / -numOfDays) * numOfRebateDays,
+          rebates:
+            (parseFloat(obj.rebates.toFixed(2)) / numOfDays) * numOfRebateDays,
+          currentTradeDiscounts:
+            (parseFloat(obj.currentTradeDiscounts.toFixed(2)) / -numOfDays) *
+            numOfRebateDays,
+          grossProfit:
+            (parseFloat(obj.grossProfit.toFixed(2)) / numOfDays) *
+            numOfRebateDays,
+          grossprofitMargin:
+            (parseFloat(obj.grossProfit.toFixed(2)) /
+              parseFloat(obj.sales.toFixed(2))) *
+            100,
+        }))[0],
     }));
+
+    return final;
   }
 
   async getSalesByCust(start: string, end: string, cid: string) {
@@ -752,11 +1055,11 @@ export class SalesService {
       quantity: sale.quantity,
       sales: parseFloat(sale.sales.toFixed(2)),
       rebates: parseFloat(sale.rebates.toFixed(2)),
+      currentTradeDiscounts:
+        parseFloat(sale.currentTradeDiscounts.toFixed(2)) * -1,
       costs: parseFloat(sale.costs.toFixed(2)) * -1,
       grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
-      currentTradeDiscounts:
-        parseFloat(sale.currentTradeDiscounts.toFixed(2)) * -1,
       normalizedTrailingTwelveMonths: rebates
         .filter(
           obj => obj._id.cid == sale._id.cid && obj._id.iid == sale._id.iid,
@@ -771,10 +1074,188 @@ export class SalesService {
           grossProfit: parseFloat(obj.grossProfit.toFixed(2)),
           grossprofitMargin: parseFloat(obj.grossProfitMargin.toFixed(2)),
         }))[0],
+      trailingTwelveMonths: rebates
+        .filter(
+          obj => obj._id.iid == sale._id.iid && obj._id.cid == sale._id.cid,
+        )
+        .map(obj => ({
+          quantity:
+            (parseFloat(obj.quantity.toFixed()) / numOfDays) * numOfRebateDays,
+          sales:
+            (parseFloat(obj.sales.toFixed(2)) / numOfDays) * numOfRebateDays,
+          costs:
+            (parseFloat(obj.costs.toFixed(2)) / -numOfDays) * numOfRebateDays,
+          rebates:
+            (parseFloat(obj.rebates.toFixed(2)) / numOfDays) * numOfRebateDays,
+          currentTradeDiscounts:
+            (parseFloat(obj.currentTradeDiscounts.toFixed(2)) / -numOfDays) *
+            numOfRebateDays,
+          grossProfit:
+            (parseFloat(obj.grossProfit.toFixed(2)) / numOfDays) *
+            numOfRebateDays,
+          grossprofitMargin:
+            (parseFloat(obj.grossProfit.toFixed(2)) /
+              parseFloat(obj.sales.toFixed(2))) *
+            100,
+        }))[0],
     }));
   }
 
   async getSalesByItem(start: string, end: string, iid: string) {
+    const rebateStartDate = new Date(
+      new Date(end).setFullYear(new Date(end).getFullYear() - 1),
+    );
+    const rebateEndDate = new Date(end);
+
+    const numOfDays =
+      (new Date(end).getTime() - new Date(start).getTime()) /
+      (1000 * 60 * 60 * 24);
+    const numOfRebateDays =
+      (rebateEndDate.getTime() - rebateStartDate.getTime()) /
+      (1000 * 60 * 60 * 24);
+
+    const rebates = await this.saleModel
+      .aggregate([
+        {
+          $match: {
+            DATE: { $gte: rebateStartDate, $lte: rebateEndDate },
+            ITEM: { $in: iid.split('-') },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              customer: '$CNAME',
+              cid: '$CUST',
+              item: '$INAME',
+              iid: '$ITEM',
+            },
+            _quantity: { $sum: '$QTY' },
+            _sales: { $sum: '$SALE' },
+            _costs: { $sum: '$COST' },
+            _rebates: { $sum: '$REBATECREDIT' },
+          },
+        },
+        {
+          $project: {
+            quantity: {
+              $multiply: [
+                { $divide: ['$_quantity', numOfRebateDays] },
+                numOfDays,
+              ],
+            },
+            sales: {
+              $multiply: [{ $divide: ['$_sales', numOfRebateDays] }, numOfDays],
+            },
+            costs: {
+              $multiply: [{ $divide: ['$_costs', numOfRebateDays] }, numOfDays],
+            },
+            rebates: {
+              $multiply: [
+                { $divide: ['$_rebates', numOfRebateDays] },
+                numOfDays,
+              ],
+            },
+          },
+        },
+        {
+          $addFields: {
+            currentTradeDiscounts: {
+              $switch: {
+                branches: [
+                  {
+                    case: { $eq: ['$_id.cid', '1300'] },
+                    then: { $multiply: ['$sales', 0.075] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '2091'] },
+                    then: { $multiply: ['$sales', 0.03] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1716'] },
+                    then: { $multiply: ['$sales', 0.05] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '2084'] },
+                    then: { $multiply: ['$sales', 0.0324] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '9988'] },
+                    then: { $multiply: ['$sales', 0.08] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '2614'] },
+                    then: { $multiply: ['$sales', 0.01] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1070'] },
+                    then: { $multiply: ['$sales', 0.01] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1402'] },
+                    then: { $multiply: ['$sales', 0.07] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1404'] },
+                    then: { $multiply: ['$sales', 0.07] },
+                  },
+                ],
+                default: 0,
+              },
+            },
+          },
+        },
+        {
+          $addFields: {
+            grossProfit: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: {
+                  $add: [
+                    '$rebates',
+                    {
+                      $subtract: [
+                        '$sales',
+                        { $add: ['$currentTradeDiscounts', '$costs'] },
+                      ],
+                    },
+                  ],
+                },
+                else: 0,
+              },
+            },
+            grossProfitMargin: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: {
+                  $multiply: [
+                    {
+                      $divide: [
+                        {
+                          $add: [
+                            '$rebates',
+                            {
+                              $subtract: [
+                                '$sales',
+                                { $add: ['$currentTradeDiscounts', '$costs'] },
+                              ],
+                            },
+                          ],
+                        },
+                        '$sales',
+                      ],
+                    },
+                    100,
+                  ],
+                },
+                else: 0,
+              },
+            },
+          },
+        },
+      ])
+      .exec();
+
     const salesByItem = await this.saleModel
       .aggregate([
         {
@@ -903,7 +1384,7 @@ export class SalesService {
       ])
       .exec();
 
-    return salesByItem.map(sale => ({
+    const final = salesByItem.map(sale => ({
       _id: sale._id,
       quantity: sale.quantity,
       sales: parseFloat(sale.sales.toFixed(2)),
@@ -913,10 +1394,202 @@ export class SalesService {
       grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
       currentTradeDiscounts:
         parseFloat(sale.currentTradeDiscounts.toFixed(2)) * -1,
+      normalizedTrailingTwelveMonths: rebates
+        .filter(
+          obj => obj._id.cid == sale._id.cid && obj._id.iid == sale._id.iid,
+        )
+        .map(obj => ({
+          quantity: parseFloat(obj.quantity.toFixed()),
+          sales: parseFloat(obj.sales.toFixed(2)),
+          costs: parseFloat(obj.costs.toFixed(2)) * -1,
+          rebates: parseFloat(obj.rebates.toFixed(2)),
+          currentTradeDiscounts:
+            parseFloat(obj.currentTradeDiscounts.toFixed(2)) * -1,
+          grossProfit: parseFloat(obj.grossProfit.toFixed(2)),
+          grossprofitMargin: parseFloat(obj.grossProfitMargin.toFixed(2)),
+        }))[0],
+      trailingTwelveMonths: rebates
+        .filter(
+          obj => obj._id.iid == sale._id.iid && obj._id.cid == sale._id.cid,
+        )
+        .map(obj => ({
+          quantity:
+            (parseFloat(obj.quantity.toFixed()) / numOfDays) * numOfRebateDays,
+          sales:
+            (parseFloat(obj.sales.toFixed(2)) / numOfDays) * numOfRebateDays,
+          costs:
+            (parseFloat(obj.costs.toFixed(2)) / -numOfDays) * numOfRebateDays,
+          rebates:
+            (parseFloat(obj.rebates.toFixed(2)) / numOfDays) * numOfRebateDays,
+          currentTradeDiscounts:
+            (parseFloat(obj.currentTradeDiscounts.toFixed(2)) / -numOfDays) *
+            numOfRebateDays,
+          grossProfit:
+            (parseFloat(obj.grossProfit.toFixed(2)) / numOfDays) *
+            numOfRebateDays,
+          grossprofitMargin:
+            (parseFloat(obj.grossProfit.toFixed(2)) /
+              parseFloat(obj.sales.toFixed(2))) *
+            100,
+        }))[0],
     }));
+
+    return final;
   }
 
   async getSummaryByCust(start: string, end: string, cid: string) {
+    const rebateStartDate = new Date(
+      new Date(end).setFullYear(new Date(end).getFullYear() - 1),
+    );
+    const rebateEndDate = new Date(end);
+
+    const numOfDays =
+      (new Date(end).getTime() - new Date(start).getTime()) /
+      (1000 * 60 * 60 * 24);
+    const numOfRebateDays =
+      (rebateEndDate.getTime() - rebateStartDate.getTime()) /
+      (1000 * 60 * 60 * 24);
+
+    const rebates = await this.saleModel
+      .aggregate([
+        {
+          $match: {
+            DATE: { $gte: rebateStartDate, $lte: rebateEndDate },
+            CUST: { $in: cid.split('-') },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              customer: '$CNAME',
+              cid: '$CUST',
+            },
+            _quantity: { $sum: '$QTY' },
+            _sales: { $sum: '$SALE' },
+            _costs: { $sum: '$COST' },
+            _rebates: { $sum: '$REBATECREDIT' },
+          },
+        },
+        {
+          $project: {
+            quantity: {
+              $multiply: [
+                { $divide: ['$_quantity', numOfRebateDays] },
+                numOfDays,
+              ],
+            },
+            sales: {
+              $multiply: [{ $divide: ['$_sales', numOfRebateDays] }, numOfDays],
+            },
+            costs: {
+              $multiply: [{ $divide: ['$_costs', numOfRebateDays] }, numOfDays],
+            },
+            rebates: {
+              $multiply: [
+                { $divide: ['$_rebates', numOfRebateDays] },
+                numOfDays,
+              ],
+            },
+          },
+        },
+        {
+          $addFields: {
+            currentTradeDiscounts: {
+              $switch: {
+                branches: [
+                  {
+                    case: { $eq: ['$_id.cid', '1300'] },
+                    then: { $multiply: ['$sales', 0.075] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '2091'] },
+                    then: { $multiply: ['$sales', 0.03] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1716'] },
+                    then: { $multiply: ['$sales', 0.05] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '2084'] },
+                    then: { $multiply: ['$sales', 0.0324] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '9988'] },
+                    then: { $multiply: ['$sales', 0.08] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '2614'] },
+                    then: { $multiply: ['$sales', 0.01] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1070'] },
+                    then: { $multiply: ['$sales', 0.01] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1402'] },
+                    then: { $multiply: ['$sales', 0.07] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1404'] },
+                    then: { $multiply: ['$sales', 0.07] },
+                  },
+                ],
+                default: 0,
+              },
+            },
+          },
+        },
+        {
+          $addFields: {
+            grossProfit: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: {
+                  $add: [
+                    '$rebates',
+                    {
+                      $subtract: [
+                        '$sales',
+                        { $add: ['$currentTradeDiscounts', '$costs'] },
+                      ],
+                    },
+                  ],
+                },
+                else: 0,
+              },
+            },
+            grossProfitMargin: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: {
+                  $multiply: [
+                    {
+                      $divide: [
+                        {
+                          $add: [
+                            '$rebates',
+                            {
+                              $subtract: [
+                                '$sales',
+                                { $add: ['$currentTradeDiscounts', '$costs'] },
+                              ],
+                            },
+                          ],
+                        },
+                        '$sales',
+                      ],
+                    },
+                    100,
+                  ],
+                },
+                else: 0,
+              },
+            },
+          },
+        },
+      ])
+      .exec();
+
     const summaryByCust = await this.saleModel
       .aggregate([
         {
@@ -1043,20 +1716,303 @@ export class SalesService {
       ])
       .exec();
 
-    return summaryByCust.map(sale => ({
+    const final = summaryByCust.map(sale => ({
       _id: sale._id,
       quantity: sale.quantity,
       sales: parseFloat(sale.sales.toFixed(2)),
       costs: parseFloat(sale.costs.toFixed(2)) * -1,
       rebates: parseFloat(sale.rebates.toFixed(2)),
-      grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
-      grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
       currentTradeDiscounts:
         parseFloat(sale.currentTradeDiscounts.toFixed(2)) * -1,
+      grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
+      grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
+      normalizedTrailingTwelveMonths: rebates
+        .filter(obj => obj._id.cid == sale._id.cid)
+        .map(obj => ({
+          quantity: parseFloat(obj.quantity.toFixed()),
+          sales: parseFloat(obj.sales.toFixed(2)),
+          costs: parseFloat(obj.costs.toFixed(2)) * -1,
+          rebates: parseFloat(obj.rebates.toFixed(2)),
+          currentTradeDiscounts:
+            parseFloat(obj.currentTradeDiscounts.toFixed(2)) * -1,
+          grossProfit: parseFloat(obj.grossProfit.toFixed(2)),
+          grossprofitMargin: parseFloat(obj.grossProfitMargin.toFixed(2)),
+        }))[0],
+      trailingTwelveMonths: rebates
+        .filter(obj => obj._id.cid == sale._id.cid)
+        .map(obj => ({
+          quantity:
+            (parseFloat(obj.quantity.toFixed()) / numOfDays) * numOfRebateDays,
+          sales:
+            (parseFloat(obj.sales.toFixed(2)) / numOfDays) * numOfRebateDays,
+          costs:
+            (parseFloat(obj.costs.toFixed(2)) / -numOfDays) * numOfRebateDays,
+          rebates:
+            (parseFloat(obj.rebates.toFixed(2)) / numOfDays) * numOfRebateDays,
+          currentTradeDiscounts:
+            (parseFloat(obj.currentTradeDiscounts.toFixed(2)) / -numOfDays) *
+            numOfRebateDays,
+          grossProfit:
+            (parseFloat(obj.grossProfit.toFixed(2)) / numOfDays) *
+            numOfRebateDays,
+          grossprofitMargin:
+            (parseFloat(obj.grossProfit.toFixed(2)) /
+              parseFloat(obj.sales.toFixed(2))) *
+            100,
+        }))[0],
     }));
+
+    return final;
   }
 
   async getSummaryByItem(start: string, end: string, iid: string) {
+    const rebateStartDate = new Date(
+      new Date(end).setFullYear(new Date(end).getFullYear() - 1),
+    );
+    const rebateEndDate = new Date(end);
+
+    const numOfDays =
+      (new Date(end).getTime() - new Date(start).getTime()) /
+      (1000 * 60 * 60 * 24);
+    const numOfRebateDays =
+      (rebateEndDate.getTime() - rebateStartDate.getTime()) /
+      (1000 * 60 * 60 * 24);
+
+    const rebates = await this.saleModel
+      .aggregate([
+        {
+          $match: {
+            DATE: { $gte: rebateStartDate, $lte: rebateEndDate },
+            ITEM: { $in: iid.split("-")},
+          },
+        },
+        {
+          $group: {
+            _id: {
+              customer: '$CNAME',
+              cid: '$CUST',
+              item: '$INAME',
+              iid: '$ITEM',
+            },
+            _quantity: { $sum: '$QTY' },
+            _sales: { $sum: '$SALE' },
+            _costs: { $sum: '$COST' },
+            _rebates: { $sum: '$REBATECREDIT' },
+          },
+        },
+        {
+          $project: {
+            quantity: {
+              $multiply: [
+                { $divide: ['$_quantity', numOfRebateDays] },
+                numOfDays,
+              ],
+            },
+            sales: {
+              $multiply: [{ $divide: ['$_sales', numOfRebateDays] }, numOfDays],
+            },
+            costs: {
+              $multiply: [{ $divide: ['$_costs', numOfRebateDays] }, numOfDays],
+            },
+            rebates: {
+              $multiply: [
+                { $divide: ['$_rebates', numOfRebateDays] },
+                numOfDays,
+              ],
+            },
+          },
+        },
+        {
+          $addFields: {
+            currentTradeDiscounts: {
+              $switch: {
+                branches: [
+                  {
+                    case: { $eq: ['$_id.cid', '1300'] },
+                    then: { $multiply: ['$sales', 0.075] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '2091'] },
+                    then: { $multiply: ['$sales', 0.03] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1716'] },
+                    then: { $multiply: ['$sales', 0.05] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '2084'] },
+                    then: { $multiply: ['$sales', 0.0324] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '9988'] },
+                    then: { $multiply: ['$sales', 0.08] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '2614'] },
+                    then: { $multiply: ['$sales', 0.01] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1070'] },
+                    then: { $multiply: ['$sales', 0.01] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1402'] },
+                    then: { $multiply: ['$sales', 0.07] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1404'] },
+                    then: { $multiply: ['$sales', 0.07] },
+                  },
+                ],
+                default: 0,
+              },
+            },
+          },
+        },
+        {
+          $addFields: {
+            grossProfit: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: {
+                  $add: [
+                    '$rebates',
+                    {
+                      $subtract: [
+                        '$sales',
+                        { $add: ['$currentTradeDiscounts', '$costs'] },
+                      ],
+                    },
+                  ],
+                },
+                else: 0,
+              },
+            },
+            grossProfitMargin: {
+              $cond: {
+                if: { $gt: ['$sales', 0] },
+                then: {
+                  $multiply: [
+                    {
+                      $divide: [
+                        {
+                          $add: [
+                            '$rebates',
+                            {
+                              $subtract: [
+                                '$sales',
+                                { $add: ['$currentTradeDiscounts', '$costs'] },
+                              ],
+                            },
+                          ],
+                        },
+                        '$sales',
+                      ],
+                    },
+                    100,
+                  ],
+                },
+                else: 0,
+              },
+            },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              item: '$_id.item',
+              iid: '$_id.iid',
+            },
+            quantity: { $sum: '$quantity' },
+            sales: { $sum: '$sales' },
+            rebates: { $sum: '$rebates' },
+            costs: { $sum: '$costs' },
+            currentTradeDiscounts: { $sum: '$currentTradeDiscounts' },
+            grossProfit: { $sum: '$grossProfit' },
+          },
+        },
+      ])
+      .exec();
+
+    const tradeDiscounts = await this.saleModel
+      .aggregate([
+        {
+          $match: {
+            DATE: { $gte: new Date(start), $lte: new Date(end) },
+            ITEM: { $in: iid.split("-") },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              customer: '$CNAME',
+              cid: '$CUST',
+              item: '$INAME',
+              iid: '$ITEM',
+            },
+            sales: { $sum: '$SALE' },
+          },
+        },
+        {
+          $addFields: {
+            currentTradeDiscounts: {
+              $switch: {
+                branches: [
+                  {
+                    case: { $eq: ['$_id.cid', '1300'] },
+                    then: { $multiply: ['$sales', 0.075] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '2091'] },
+                    then: { $multiply: ['$sales', 0.03] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1716'] },
+                    then: { $multiply: ['$sales', 0.05] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '2084'] },
+                    then: { $multiply: ['$sales', 0.0324] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '9988'] },
+                    then: { $multiply: ['$sales', 0.08] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '2614'] },
+                    then: { $multiply: ['$sales', 0.01] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1070'] },
+                    then: { $multiply: ['$sales', 0.01] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1402'] },
+                    then: { $multiply: ['$sales', 0.07] },
+                  },
+                  {
+                    case: { $eq: ['$_id.cid', '1404'] },
+                    then: { $multiply: ['$sales', 0.07] },
+                  },
+                ],
+                default: 0,
+              },
+            },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              item: '$_id.item',
+              iid: '$_id.iid',
+            },
+            sales: { $sum: '$sales' },
+            currentTradeDiscounts: { $sum: '$currentTradeDiscounts' },
+          },
+        },
+      ])
+      .exec();
+
     const summaryByItem = await this.saleModel
       .aggregate([
         {
@@ -1141,14 +2097,73 @@ export class SalesService {
       ])
       .exec();
 
-    return summaryByItem.map(sale => ({
+    const final = summaryByItem.map(sale => ({
       _id: sale._id,
       quantity: sale.quantity,
       sales: parseFloat(sale.sales.toFixed(2)),
       costs: parseFloat(sale.costs.toFixed(2)) * -1,
-      grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
-      grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
+      rebates: parseFloat(sale.rebates.toFixed(2)),
+      currentTradeDiscounts:
+        tradeDiscounts
+          .filter(obj => obj._id.iid == sale._id.iid)
+          .map(obj => obj.currentTradeDiscounts)[0]
+          .toFixed(2) * -1,
+      grossProfit:
+        parseFloat(sale.grossProfit.toFixed(2)) +
+        tradeDiscounts
+          .filter(obj => obj._id.iid == sale._id.iid)
+          .map(obj => obj.currentTradeDiscounts)[0]
+          .toFixed(2) *
+        -1,
+      grossProfitMargin:
+        ((parseFloat(sale.grossProfit.toFixed(2)) +
+          tradeDiscounts
+            .filter(obj => obj._id.iid == sale._id.iid)
+            .map(obj => obj.currentTradeDiscounts)[0]
+            .toFixed(2) *
+          -1) /
+          parseFloat(sale.sales.toFixed(2))) *
+        100,
+      normalizedTrailingTwelveMonths: rebates
+        .filter(obj => obj._id.iid == sale._id.iid)
+        .map(obj => ({
+          quantity: parseFloat(obj.quantity.toFixed()),
+          sales: parseFloat(obj.sales.toFixed(2)),
+          costs: parseFloat(obj.costs.toFixed(2)) * -1,
+          rebates: parseFloat(obj.rebates.toFixed(2)),
+          currentTradeDiscounts:
+            parseFloat(obj.currentTradeDiscounts.toFixed(2)) * -1,
+          grossProfit: parseFloat(obj.grossProfit.toFixed(2)),
+          grossprofitMargin:
+            (parseFloat(obj.grossProfit.toFixed(2)) /
+              parseFloat(obj.sales.toFixed(2))) *
+            100,
+        }))[0],
+      trailingTwelveMonths: rebates
+        .filter(obj => obj._id.iid == sale._id.iid)
+        .map(obj => ({
+          quantity:
+            (parseFloat(obj.quantity.toFixed()) / numOfDays) * numOfRebateDays,
+          sales:
+            (parseFloat(obj.sales.toFixed(2)) / numOfDays) * numOfRebateDays,
+          costs:
+            (parseFloat(obj.costs.toFixed(2)) / -numOfDays) * numOfRebateDays,
+          rebates:
+            (parseFloat(obj.rebates.toFixed(2)) / numOfDays) * numOfRebateDays,
+          currentTradeDiscounts:
+            (parseFloat(obj.currentTradeDiscounts.toFixed(2)) / -numOfDays) *
+            numOfRebateDays,
+          grossProfit:
+            (parseFloat(obj.grossProfit.toFixed(2)) / numOfDays) *
+            numOfRebateDays,
+          grossprofitMargin:
+            (parseFloat(obj.grossProfit.toFixed(2)) /
+              parseFloat(obj.sales.toFixed(2))) *
+            100,
+        }))[0],
     }));
+
+    return final;
   }
 
   async getDistinctCustomers(start: string, end: string) {
