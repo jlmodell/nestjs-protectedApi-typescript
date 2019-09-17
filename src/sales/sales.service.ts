@@ -319,11 +319,16 @@ export class SalesService {
     const final = sales.map(sale => ({
       _id: sale._id,
       quantity: sale.quantity,
-      avgPrice: parseFloat(sale.sales.toFixed(2)) / sale.quantity,
+      avgPrice:
+        sale.quantity > 0
+          ? parseFloat(sale.sales.toFixed(2)) / sale.quantity
+          : 0,
       afterRebateAvgPrice:
-        (parseFloat(sale.sales.toFixed(2)) +
-          parseFloat(sale.rebates.toFixed(2))) /
-        sale.quantity,
+        sale.quantity > 0
+          ? (parseFloat(sale.sales.toFixed(2)) +
+              parseFloat(sale.rebates.toFixed(2))) /
+            sale.quantity
+          : 0,
       sales: parseFloat(sale.sales.toFixed(2)),
       costs: parseFloat(sale.costs.toFixed(2)) * -1,
       rebates: parseFloat(sale.rebates.toFixed(2)),
@@ -704,11 +709,16 @@ export class SalesService {
     const final = sales.map(sale => ({
       _id: sale._id,
       quantity: sale.quantity,
-      avgPrice: parseFloat(sale.sales.toFixed(2)) / sale.quantity,
+      avgPrice:
+        sale.quantity > 0
+          ? parseFloat(sale.sales.toFixed(2)) / sale.quantity
+          : 0,
       afterRebateAvgPrice:
-        (parseFloat(sale.sales.toFixed(2)) +
-          parseFloat(sale.rebates.toFixed(2))) /
-        sale.quantity,
+        sale.quantity > 0
+          ? (parseFloat(sale.sales.toFixed(2)) +
+              parseFloat(sale.rebates.toFixed(2))) /
+            sale.quantity
+          : 0,
       sales: parseFloat(sale.sales.toFixed(2)),
       rebates: parseFloat(sale.rebates.toFixed(2)),
       costs: parseFloat(sale.costs.toFixed(2)) * -1,
@@ -1063,11 +1073,16 @@ export class SalesService {
     return salesByCust.map(sale => ({
       _id: sale._id,
       quantity: sale.quantity,
-      avgPrice: parseFloat(sale.sales.toFixed(2)) / sale.quantity,
+      avgPrice:
+        sale.quantity > 0
+          ? parseFloat(sale.sales.toFixed(2)) / sale.quantity
+          : 0,
       afterRebateAvgPrice:
-        (parseFloat(sale.sales.toFixed(2)) +
-          parseFloat(sale.rebates.toFixed(2))) /
-        sale.quantity,
+        sale.quantity > 0
+          ? (parseFloat(sale.sales.toFixed(2)) +
+              parseFloat(sale.rebates.toFixed(2))) /
+            sale.quantity
+          : 0,
       sales: parseFloat(sale.sales.toFixed(2)),
       rebates: parseFloat(sale.rebates.toFixed(2)),
       currentTradeDiscounts:
@@ -1402,11 +1417,16 @@ export class SalesService {
     const final = salesByItem.map(sale => ({
       _id: sale._id,
       quantity: sale.quantity,
-      avgPrice: parseFloat(sale.sales.toFixed(2)) / sale.quantity,
+      avgPrice:
+        sale.quantity > 0
+          ? parseFloat(sale.sales.toFixed(2)) / sale.quantity
+          : 0,
       afterRebateAvgPrice:
-        (parseFloat(sale.sales.toFixed(2)) +
-          parseFloat(sale.rebates.toFixed(2))) /
-        sale.quantity,
+        sale.quantity > 0
+          ? (parseFloat(sale.sales.toFixed(2)) +
+              parseFloat(sale.rebates.toFixed(2))) /
+            sale.quantity
+          : 0,
       sales: parseFloat(sale.sales.toFixed(2)),
       rebates: parseFloat(sale.rebates.toFixed(2)),
       costs: parseFloat(sale.costs.toFixed(2)) * -1,
@@ -1739,11 +1759,16 @@ export class SalesService {
     const final = summaryByCust.map(sale => ({
       _id: sale._id,
       quantity: sale.quantity,
-      avgPrice: parseFloat(sale.sales.toFixed(2)) / sale.quantity,
+      avgPrice:
+        sale.quantity > 0
+          ? parseFloat(sale.sales.toFixed(2)) / sale.quantity
+          : 0,
       afterRebateAvgPrice:
-        (parseFloat(sale.sales.toFixed(2)) +
-          parseFloat(sale.rebates.toFixed(2))) /
-        sale.quantity,
+        sale.quantity > 0
+          ? (parseFloat(sale.sales.toFixed(2)) +
+              parseFloat(sale.rebates.toFixed(2))) /
+            sale.quantity
+          : 0,
       sales: parseFloat(sale.sales.toFixed(2)),
       costs: parseFloat(sale.costs.toFixed(2)) * -1,
       rebates: parseFloat(sale.rebates.toFixed(2)),
@@ -2125,11 +2150,16 @@ export class SalesService {
     const final = summaryByItem.map(sale => ({
       _id: sale._id,
       quantity: sale.quantity,
-      avgPrice: parseFloat(sale.sales.toFixed(2)) / sale.quantity,
+      avgPrice:
+        sale.quantity > 0
+          ? parseFloat(sale.sales.toFixed(2)) / sale.quantity
+          : 0,
       afterRebateAvgPrice:
-        (parseFloat(sale.sales.toFixed(2)) +
-          parseFloat(sale.rebates.toFixed(2))) /
-        sale.quantity,
+        sale.quantity > 0
+          ? (parseFloat(sale.sales.toFixed(2)) +
+              parseFloat(sale.rebates.toFixed(2))) /
+            sale.quantity
+          : 0,
       sales: parseFloat(sale.sales.toFixed(2)),
       costs: parseFloat(sale.costs.toFixed(2)) * -1,
       rebates: parseFloat(sale.rebates.toFixed(2)),
