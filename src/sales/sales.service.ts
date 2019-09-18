@@ -334,8 +334,8 @@ export class SalesService {
       rebates: parseFloat(sale.rebates.toFixed(2)),
       currentTradeDiscounts:
         parseFloat(sale.currentTradeDiscounts.toFixed(2)) * -1,
-      grossProfit: parseFloat(sale.grossProfit.toFixed(2)),
-      grossProfitMargin: parseFloat(sale.grossProfitMargin.toFixed(2)),
+      grossProfit: sale.quantity > 0 ? parseFloat(sale.grossProfit.toFixed(2)) : 0,
+      grossProfitMargin: sale.quantity > 0 ? parseFloat(sale.grossProfitMargin.toFixed(2)) : 0,
       normalizedTrailingTwelveMonths: rebates
         .filter(obj => obj._id.cid == sale._id.cid)
         .map(obj => ({
