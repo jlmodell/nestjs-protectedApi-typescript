@@ -37,6 +37,20 @@ export class SalesController {
     return await this.salesService.getSalesDistinctItem(start, end);
   }
 
+  //GET list of distinct items in a date range
+  @Get('distinct/iarray')
+  async getDistinctItemsByHeader(
+    @Body('start') start: string,
+    @Body('end') end: string,
+    @Headers('authorization') authHeader: string,
+  ) {
+    const verify = await this.authService.verifyUser(authHeader);
+    if (!verify.auth) {
+      return { ...verify };
+    }
+    return await this.salesService.getDistinctItemsByHeader(start, end);
+  }
+
   // @Get('/distinct/cust/:start/:end')
   // async getSales(
   //   @Param('start') start: string,
