@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Headers } from '@nestjs/common';
+import { Controller, Get, Param, Headers, Body } from '@nestjs/common';
 
 import { SalesService } from './sales.service';
 import { AuthService } from '../auth/auth.service';
@@ -35,6 +35,20 @@ export class SalesController {
       return { ...verify };
     }
     return await this.salesService.getSalesDistinctItem(start, end);
+  }
+
+  //GET list of distinct items in a date range
+  @Get('distinct/iarray')
+  async getDistinctItemsByHeader(
+    @Body('start') start: string,
+    @Body('end') end: string,
+    @Headers('authorization') authHeader: string,
+  ) {
+    const verify = await this.authService.verifyUser(authHeader);
+    if (!verify.auth) {
+      return { ...verify };
+    }
+    return await this.salesService.getDistinctItemsByHeader(start, end);
   }
 
   // @Get('/distinct/cust/:start/:end')
