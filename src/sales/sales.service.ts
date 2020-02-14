@@ -2327,51 +2327,58 @@ export class SalesService {
   }
 
   async getDistinctItemsByHeader(start: string, end: string) {
-    return await this.saleModel
-      .aggregate([
-        {
-          $project: {
-            itemList: {
-              $concat: ['$ITEM', '|', '$INAME'],
-            },
-            DATE: 1,
-            ITEM: 1,
-            INAME: 1,
-          },
-        },
-        {
-          $match: {
-            DATE: { $gte: new Date(start), $lte: new Date(end) },
-          },
-        },
-        {
-          $group: {
-            _id: null,
-            item: {
-              $addToSet: {
-                name: '$itemList',
-              },
-            },
-          },
-        },
-        {
-          $unwind: '$item',
-        },
-        {
-          $sort: {
-            item: 1,
-          },
-        },
-        {
-          $group: {
-            _id: null,
-            item: {
-              $push: '$item',
-            },
-          },
-        },
-      ])
-      .exec();    
+    // return await this.saleModel
+    //   .aggregate([
+    //     {
+    //       $project: {
+    //         itemList: {
+    //           $concat: ['$ITEM', '|', '$INAME'],
+    //         },
+    //         DATE: 1,
+    //         ITEM: 1,
+    //         INAME: 1,
+    //       },
+    //     },
+    //     {
+    //       $match: {
+    //         DATE: { $gte: new Date(start), $lte: new Date(end) },
+    //       },
+    //     },
+    //     {
+    //       $group: {
+    //         _id: null,
+    //         item: {
+    //           $addToSet: {
+    //             name: '$itemList',
+    //           },
+    //         },
+    //       },
+    //     },
+    //     {
+    //       $unwind: '$item',
+    //     },
+    //     {
+    //       $sort: {
+    //         item: 1,
+    //       },
+    //     },
+    //     {
+    //       $group: {
+    //         _id: null,
+    //         item: {
+    //           $push: '$item',
+    //         },
+    //       },
+    //     },
+    //   ])
+    //   .exec();    
+
+    return [
+      {
+        "start": start,
+        "end": end,
+      }
+    ]
   }
 
   async getAvgPrice(cid: string, iid: string, start: string, end: string) {
